@@ -96,7 +96,7 @@ The system uses PostgreSQL with the following core tables:
 
 See [plans/architecture.md](plans/architecture.md) for the complete schema.
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Document Processing
 
