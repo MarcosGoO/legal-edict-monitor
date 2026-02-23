@@ -1,0 +1,124 @@
+# =============================================================================
+# Pre-commit Configuration
+# =============================================================================
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+default_language_version:
+  python: python3.11
+
+repos:
+  # ---------------------------------------------------------------------------
+  # General hooks
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: detect-private-key
+      - id: forbid-new-submodules
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # ---------------------------------------------------------------------------
+  # Python - Ruff (linter + formatter)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.2.1
+    hooks:
+      # Linter
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      # Formatter
+      - id: ruff-format
+
+  # ---------------------------------------------------------------------------
+  # Python - Type checking with mypy
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - pydantic>=2.5.0
+          - types-redis
+          - types-requests
+        args: [--config-file=pyproject.toml]
+        exclude: ^tests/
+
+  # ---------------------------------------------------------------------------
+  # Security - Bandit
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.22
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml']
+        additional_dependencies: ['bandit[toml]']
+        exclude: ^tests/
+
+  # ---------------------------------------------------------------------------
+  # Secrets detection
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package.lock.json
+
+  # ---------------------------------------------------------------------------
+  # Markdown
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix']
+        exclude: '^plans/'
+
+  # ---------------------------------------------------------------------------
+  # Dockerfile
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        args: ['--ignore', 'DL3008', '--ignore', 'DL3009']
+
+  # ---------------------------------------------------------------------------
+  # Spell checking
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        args: ['--skip', '*.lock,*.min.js,*.min.css']
+        types_or: [python, markdown]
+
+# =============================================================================
+# CI Configuration
+# =============================================================================
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

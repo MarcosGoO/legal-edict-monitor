@@ -1,0 +1,85 @@
+# Docker ignore file - excludes from Docker build context
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Secrets - NEVER include in Docker build
+*.pem
+*.key
+secrets/
+.secrets/
+credentials.json
+service-account.json
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Local development
+docker-compose.override.yml
+.docker/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Pre-commit
+.pre-commit-config.yaml
+.secrets.baseline
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# Plans and architecture
+plans/
+
+# OS files
+.DS_Store
+Thumbs.db
