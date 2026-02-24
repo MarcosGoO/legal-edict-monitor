@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     # Application
     # =========================================================================
     app_name: str = "edict-guardian"
-    app_env: Literal["development", "staging", "production"] = "development"
+    app_env: Literal["development", "staging", "production", "test"] = "development"
     debug: bool = False
     secret_key: str = Field(..., min_length=32)
     
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     
     @property
     def is_development(self) -> bool:
-        return self.app_env == "development"
+        return self.app_env in ["development", "test"]
     
     # =========================================================================
     # Database
