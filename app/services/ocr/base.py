@@ -52,6 +52,7 @@ class OCRResult:
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
+            "text": self.text,
             "text_length": self.character_count,
             "word_count": self.word_count,
             "engine_used": self.engine_used.value,
@@ -60,6 +61,18 @@ class OCRResult:
             "is_searchable": self.is_searchable,
             "metadata": self.metadata,
         }
+    
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "OCRResult":
+        """Create OCRResult from dictionary."""
+        return cls(
+            text=data.get("text", ""),
+            engine_used=OCREngine(data.get("engine_used", "native")),
+            confidence=data.get("confidence", 0.0),
+            pages_processed=data.get("pages_processed", 0),
+            is_searchable=data.get("is_searchable", False),
+            metadata=data.get("metadata", {}),
+        )
 
 
 @dataclass

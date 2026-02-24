@@ -5,6 +5,7 @@ Intelligent OCR wrapper that:
 1. Analyzes PDFs to detect text vs scanned content
 2. Selects the best extraction method
 3. Falls back through multiple OCR engines
+4. Caches results to avoid re-processing
 """
 
 import logging
@@ -250,19 +251,38 @@ class SmartOCRService:
         
         return temp_path
     
-    async def extract_text_from_bytes(self, pdf_bytes: bytes) -> OCRResult:
+    async def extract_text_from_bytes(
+        self,
+        pdf_bytes: bytes,
+        use_cache: bool = True,
+    ) -> OCRResult:
         """
         Extract text from PDF bytes.
         
         Convenience method for processing PDFs in memory.
+        Uses caching to avoid re-processing the same documents.
         
         Args:
             pdf_bytes: PDF file as bytes
+            use_cache: Whether to use caching (default: True)
             
         Returns:
             OCRResult with extracted text
         """
         import os
+        from app.services.cache import get_cache_service, CacheService
+        
+        # Compute document hash for caching
+        doc_hash = CacheService.compute_document_hash(pdf_bytes)
+        
+        # Check cache if enabled
+        if use_cache:
+            cache = get_cache_service()
+            cached_result = await cache.get_ocr_result(doc_hash)
+            
+            if cached_result:
+                logger.info(f"Using cached OCR result for {doc_hash[:16]}...")
+                return OCRResult.from_dict(cached_result)
         
         temp_dir = tempfile.gettempdir()
         temp_path = Path(temp_dir) / f"ocr_{os.getpid()}_{id(pdf_bytes)}.pdf"
@@ -271,7 +291,13 @@ class SmartOCRService:
             with open(temp_path, "wb") as f:
                 f.write(pdf_bytes)
             
-            return await self.process_pdf(temp_path)
+            result = await self.process_pdf(temp_path)
+            
+            # Cache the result if caching is enabled
+            if use_cache and result.text:
+                await cache.set_ocr_result(doc_hash, result.to_dict())
+            
+            return result
         finally:
             if temp_path.exists():
                 temp_path.unlink()
