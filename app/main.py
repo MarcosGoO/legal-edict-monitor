@@ -61,15 +61,75 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 # Create FastAPI application
 app = FastAPI(
-    title=settings.app_name,
-    description=(
-        "Legal notification backend for scraping and analyzing "
-        "Colombian legal gazettes and court edicts."
-    ),
+    title="Edict Guardian API",
+    description="""
+## Legal Notification Backend for Colombian Court Edicts
+
+Edict Guardian monitors official Colombian court portals, extracts legal entities 
+from PDF documents using OCR and NLP, and notifies law firms when their clients 
+are mentioned in legal proceedings.
+
+### Key Features
+
+* **Smart OCR Pipeline** - Multi-engine OCR with automatic fallback (Native → Tesseract → AWS Textract)
+* **Colombian Entity Extraction** - Specialized parser for Radicados, NITs, Cédulas, and names
+* **Real-time Matching** - High-efficiency watchlist matching engine
+* **Caching** - Redis-based caching to avoid re-processing documents
+
+### Entity Types Supported
+
+| Type | Description | Example |
+|------|-------------|---------|
+| Radicado | 23-digit case number | 2023-00123-45-67-890-12 |
+| NIT | Colombian Tax ID | 900123456-7 |
+| Cédula | Colombian ID | 12345678 |
+| Nombre | Person name | JOSÉ MARÍA RODRÍGUEZ |
+
+### Rate Limits
+
+* 60 requests per minute per IP
+* 1000 requests per hour per IP
+
+### Authentication
+
+Most endpoints require authentication. Use the `/api/v1/auth/login` endpoint to obtain a token.
+""",
     version="0.1.0",
     docs_url="/docs" if settings.debug else None,
     redoc_url="/redoc" if settings.debug else None,
     lifespan=lifespan,
+    contact={
+        "name": "Edict Guardian Team",
+        "email": "support@edictguardian.com",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    servers=[
+        {
+            "url": "http://localhost:8000",
+            "description": "Development server",
+        },
+        {
+            "url": "https://api.edictguardian.com",
+            "description": "Production server",
+        },
+    ],
+    openapi_tags=[
+        {
+            "name": "Documents",
+            "description": "Document processing and entity extraction operations.",
+        },
+        {
+            "name": "Clients",
+            "description": "Client and watchlist management operations.",
+        },
+        {
+            "name": "Health",
+            "description": "Health check endpoints for monitoring and load balancers.",
+        },
+    ],
 )
 
 # Configure CORS
@@ -95,6 +155,18 @@ register_exception_handlers(app)
 
 # Include API routers
 app.include_router(api_router, prefix="/api/v1")
+
+
+# Version info endpoint
+@app.get("/version", tags=["Health"])
+async def version_info() -> dict:
+    """Get API version information."""
+    return {
+        "version": "0.1.0",
+        "api_version": "v1",
+        "app_name": settings.app_name,
+        "environment": settings.app_env,
+    }
 
 
 # Health check endpoint
