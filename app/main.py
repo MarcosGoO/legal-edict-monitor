@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import close_db, init_db
+from app.database import check_database_connection, close_db, init_db
 from app.api.v1.router import api_router
 
 # Configure logging
@@ -95,12 +95,16 @@ async def health_check() -> dict:
 @app.get("/ready", tags=["Health"])
 async def readiness_check() -> dict:
     """Readiness check endpoint for Kubernetes."""
-    # TODO: Add database and Redis connectivity checks
+    # Check database connectivity
+    db_healthy = await check_database_connection()
+    
+    # Determine overall status
+    all_healthy = db_healthy
+    
     return {
-        "status": "ready",
+        "status": "ready" if all_healthy else "not_ready",
         "checks": {
-            "database": "ok",
-            "redis": "ok",
+            "database": "ok" if db_healthy else "error",
         },
     }
 

@@ -94,3 +94,19 @@ async def init_db() -> None:
 async def close_db() -> None:
     """Close database connections."""
     await engine.dispose()
+
+
+async def check_database_connection() -> bool:
+    """
+    Check if database connection is healthy.
+    
+    Returns:
+        True if connection is healthy, False otherwise.
+    """
+    try:
+        async with engine.connect() as conn:
+            # Execute a simple query to verify connection
+            await conn.execute("SELECT 1")
+        return True
+    except Exception:
+        return False
