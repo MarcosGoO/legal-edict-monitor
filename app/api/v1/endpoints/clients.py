@@ -8,7 +8,7 @@ import uuid
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 router = APIRouter()
 
@@ -19,15 +19,8 @@ router = APIRouter()
 
 class ClientCreate(BaseModel):
     """Request model for creating a client."""
-    full_name: str = Field(..., min_length=2, max_length=500)
-    document_type: Optional[str] = Field(None, pattern="^(CC|CE|NIT|PP|TI)$")
-    document_number: Optional[str] = Field(None, max_length=20)
-    nit: Optional[str] = Field(None, max_length=20)
-    aliases: list[str] = Field(default_factory=list)
-    notes: Optional[str] = None
-    
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "full_name": "JOSÉ MARÍA RODRÍGUEZ GARCÍA",
                 "document_type": "CC",
@@ -37,20 +30,20 @@ class ClientCreate(BaseModel):
                 "notes": "Client since 2023",
             }
         }
+    )
+    
+    full_name: str = Field(..., min_length=2, max_length=500)
+    document_type: Optional[str] = Field(None, pattern="^(CC|CE|NIT|PP|TI)$")
+    document_number: Optional[str] = Field(None, max_length=20)
+    nit: Optional[str] = Field(None, max_length=20)
+    aliases: list[str] = Field(default_factory=list)
+    notes: Optional[str] = None
 
 
 class ClientResponse(BaseModel):
     """Response model for a client."""
-    id: str
-    full_name: str
-    document_type: Optional[str] = None
-    document_number: Optional[str] = None
-    nit: Optional[str] = None
-    aliases: list[str] = []
-    is_active: bool = True
-    
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "id": "123e4567-e89b-12d3-a456-426614174000",
                 "full_name": "JOSÉ MARÍA RODRÍGUEZ GARCÍA",
@@ -61,6 +54,15 @@ class ClientResponse(BaseModel):
                 "is_active": True,
             }
         }
+    )
+    
+    id: str
+    full_name: str
+    document_type: Optional[str] = None
+    document_number: Optional[str] = None
+    nit: Optional[str] = None
+    aliases: list[str] = []
+    is_active: bool = True
 
 
 class ClientListResponse(BaseModel):
@@ -73,18 +75,8 @@ class ClientListResponse(BaseModel):
 
 class WatchlistCreate(BaseModel):
     """Request model for creating a watchlist entry."""
-    client_id: str
-    case_numbers: list[str] = Field(default_factory=list)
-    court_ids: list[str] = Field(default_factory=list)
-    notification_preferences: dict = Field(
-        default_factory=lambda: {
-            "channels": ["whatsapp", "email"],
-            "immediate": True,
-        }
-    )
-    
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "client_id": "123e4567-e89b-12d3-a456-426614174000",
                 "case_numbers": ["2023-00123-45-67-890-12"],
@@ -95,6 +87,17 @@ class WatchlistCreate(BaseModel):
                 },
             }
         }
+    )
+    
+    client_id: str
+    case_numbers: list[str] = Field(default_factory=list)
+    court_ids: list[str] = Field(default_factory=list)
+    notification_preferences: dict = Field(
+        default_factory=lambda: {
+            "channels": ["whatsapp", "email"],
+            "immediate": True,
+        }
+    )
 
 
 class WatchlistResponse(BaseModel):

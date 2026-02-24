@@ -11,7 +11,7 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.services.ocr import SmartOCRService, OCRResult
 from app.services.parser import ColombianEntityParser, ParseResult
@@ -27,14 +27,8 @@ router = APIRouter()
 
 class EntityResponse(BaseModel):
     """Response model for extracted entity."""
-    type: str
-    raw: str
-    normalized: str
-    confidence: float
-    context: str = ""
-    
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "type": "radicado",
                 "raw": "2023-00123-45-67-890-12",
@@ -43,6 +37,13 @@ class EntityResponse(BaseModel):
                 "context": "Radicado No. 2023-00123-45-67-890-12",
             }
         }
+    )
+    
+    type: str
+    raw: str
+    normalized: str
+    confidence: float
+    context: str = ""
 
 
 class OCRResponse(BaseModel):
@@ -65,13 +66,8 @@ class ParseResponse(BaseModel):
 
 class DocumentProcessResponse(BaseModel):
     """Response model for document processing."""
-    success: bool
-    ocr: OCRResponse | None = None
-    parse: ParseResponse | None = None
-    error: str | None = None
-    
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "success": True,
                 "ocr": {
@@ -104,14 +100,18 @@ class DocumentProcessResponse(BaseModel):
                 "error": None,
             }
         }
+    )
+    
+    success: bool
+    ocr: OCRResponse | None = None
+    parse: ParseResponse | None = None
+    error: str | None = None
 
 
 class TextParseRequest(BaseModel):
     """Request model for parsing text directly."""
-    text: str = Field(..., min_length=10, description="Text to parse for entities")
-    
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "text": (
                     "El radicado 2023-00123-45-67-890-12 corresponde al proceso "
@@ -119,6 +119,9 @@ class TextParseRequest(BaseModel):
                 )
             }
         }
+    )
+    
+    text: str = Field(..., min_length=10, description="Text to parse for entities")
 
 
 class TextParseResponse(BaseModel):
