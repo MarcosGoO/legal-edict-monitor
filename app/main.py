@@ -19,7 +19,7 @@ from app.config import settings
 from app.database import check_database_connection, close_db, init_db
 from app.redis_client import check_redis_connection, close_redis
 from app.api.v1.router import api_router
-from app.middleware import RequestLoggingMiddleware, SlowRequestMiddleware
+from app.middleware import RequestLoggingMiddleware, SlowRequestMiddleware, RateLimitMiddleware
 from app.exceptions import register_exception_handlers
 
 # Configure logging
@@ -86,6 +86,9 @@ app.add_middleware(RequestLoggingMiddleware)
 
 # Add slow request detection middleware (threshold: 1 second)
 app.add_middleware(SlowRequestMiddleware, threshold_ms=1000.0)
+
+# Add rate limiting middleware (60 requests/minute, 1000 requests/hour)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=60, requests_per_hour=1000)
 
 # Register exception handlers
 register_exception_handlers(app)
