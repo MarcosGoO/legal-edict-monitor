@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import check_database_connection, close_db, init_db
 from app.api.v1.router import api_router
+from app.middleware import RequestLoggingMiddleware, SlowRequestMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -76,6 +77,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Add request logging middleware
+app.add_middleware(RequestLoggingMiddleware)
+
+# Add slow request detection middleware (threshold: 1 second)
+app.add_middleware(SlowRequestMiddleware, threshold_ms=1000.0)
 
 # Include API routers
 app.include_router(api_router, prefix="/api/v1")
