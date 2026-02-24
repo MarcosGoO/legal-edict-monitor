@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import check_database_connection, close_db, init_db
+from app.redis_client import check_redis_connection, close_redis
 from app.api.v1.router import api_router
 from app.middleware import RequestLoggingMiddleware, SlowRequestMiddleware
 
@@ -54,6 +55,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Shutdown
     logger.info("Shutting down application")
     await close_db()
+    await close_redis()
 
 
 # Create FastAPI application
@@ -105,13 +107,17 @@ async def readiness_check() -> dict:
     # Check database connectivity
     db_healthy = await check_database_connection()
     
+    # Check Redis connectivity
+    redis_healthy = await check_redis_connection()
+    
     # Determine overall status
-    all_healthy = db_healthy
+    all_healthy = db_healthy and redis_healthy
     
     return {
         "status": "ready" if all_healthy else "not_ready",
         "checks": {
             "database": "ok" if db_healthy else "error",
+            "redis": "ok" if redis_healthy else "error",
         },
     }
 
