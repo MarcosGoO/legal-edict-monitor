@@ -6,7 +6,7 @@ Aggregates all v1 API endpoints.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import documents, clients
+from app.api.v1.endpoints import clients, documents
 
 api_router = APIRouter()
 

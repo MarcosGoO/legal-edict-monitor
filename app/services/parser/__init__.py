@@ -9,18 +9,18 @@ Provides entity extraction for Colombian legal documents:
 """
 
 from app.services.parser.base import EntityType, ExtractedEntity, ParseResult
-from app.services.parser.service import ColombianEntityParser
 from app.services.parser.input_validation import (
     CedulaField,
+    DocumentTypeField,
     NitField,
     RadicadoField,
-    DocumentTypeField,
     validate_colombian_cedula,
     validate_colombian_nit,
     validate_colombian_radicado,
-    validate_document_type,
     validate_document_number,
+    validate_document_type,
 )
+from app.services.parser.service import ColombianEntityParser
 
 __all__ = [
     "ColombianEntityParser",

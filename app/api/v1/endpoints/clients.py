@@ -5,7 +5,6 @@ Provides endpoints for managing clients and watchlist entries.
 """
 
 import uuid
-from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field
@@ -31,13 +30,13 @@ class ClientCreate(BaseModel):
             }
         }
     )
-    
+
     full_name: str = Field(..., min_length=2, max_length=500)
-    document_type: Optional[str] = Field(None, pattern="^(CC|CE|NIT|PP|TI)$")
-    document_number: Optional[str] = Field(None, max_length=20)
-    nit: Optional[str] = Field(None, max_length=20)
+    document_type: str | None = Field(None, pattern="^(CC|CE|NIT|PP|TI)$")
+    document_number: str | None = Field(None, max_length=20)
+    nit: str | None = Field(None, max_length=20)
     aliases: list[str] = Field(default_factory=list)
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class ClientResponse(BaseModel):
@@ -55,12 +54,12 @@ class ClientResponse(BaseModel):
             }
         }
     )
-    
+
     id: str
     full_name: str
-    document_type: Optional[str] = None
-    document_number: Optional[str] = None
-    nit: Optional[str] = None
+    document_type: str | None = None
+    document_number: str | None = None
+    nit: str | None = None
     aliases: list[str] = []
     is_active: bool = True
 
@@ -88,7 +87,7 @@ class WatchlistCreate(BaseModel):
             }
         }
     )
-    
+
     client_id: str
     case_numbers: list[str] = Field(default_factory=list)
     court_ids: list[str] = Field(default_factory=list)
@@ -122,8 +121,8 @@ class WatchlistResponse(BaseModel):
 async def list_clients(
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
-    is_active: Optional[bool] = Query(None, description="Filter by active status"),
-    search: Optional[str] = Query(None, description="Search by name or document"),
+    is_active: bool | None = Query(None, description="Filter by active status"),
+    search: str | None = Query(None, description="Search by name or document"),
 ) -> ClientListResponse:
     """
     List clients.

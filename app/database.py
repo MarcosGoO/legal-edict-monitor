@@ -35,9 +35,9 @@ metadata = MetaData(naming_convention=convention)
 
 class Base(DeclarativeBase):
     """Base class for all database models."""
-    
+
     metadata = metadata
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert model to dictionary."""
         return {

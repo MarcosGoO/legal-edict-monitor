@@ -10,14 +10,13 @@ from typing import Any
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import ValidationError
 
 logger = logging.getLogger(__name__)
 
 
 class AppException(Exception):
     """Base exception for application errors."""
-    
+
     def __init__(
         self,
         message: str,
@@ -32,7 +31,7 @@ class AppException(Exception):
 
 class NotFoundException(AppException):
     """Exception for resource not found errors."""
-    
+
     def __init__(self, resource: str, identifier: str | None = None):
         message = f"{resource} not found"
         if identifier:
@@ -46,7 +45,7 @@ class NotFoundException(AppException):
 
 class BadRequestException(AppException):
     """Exception for bad request errors."""
-    
+
     def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             message=message,
@@ -57,7 +56,7 @@ class BadRequestException(AppException):
 
 class ConflictException(AppException):
     """Exception for conflict errors (e.g., duplicate resources)."""
-    
+
     def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             message=message,
@@ -68,7 +67,7 @@ class ConflictException(AppException):
 
 class ServiceUnavailableException(AppException):
     """Exception for service unavailability errors."""
-    
+
     def __init__(self, service: str, reason: str | None = None):
         message = f"Service '{service}' is unavailable"
         if reason:
@@ -104,20 +103,20 @@ def create_error_response(
             "message": message,
         }
     }
-    
+
     if details:
         response["error"]["details"] = details
-    
+
     if request_id:
         response["error"]["request_id"] = request_id
-    
+
     return response
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
     """Handle application exceptions."""
     request_id = getattr(request.state, "request_id", None)
-    
+
     logger.warning(
         f"Application error: {exc.message}",
         extra={
@@ -126,7 +125,7 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
             "details": exc.details,
         },
     )
-    
+
     return JSONResponse(
         status_code=exc.status_code,
         content=create_error_response(
@@ -144,7 +143,7 @@ async def validation_exception_handler(
 ) -> JSONResponse:
     """Handle Pydantic validation errors."""
     request_id = getattr(request.state, "request_id", None)
-    
+
     # Format validation errors
     errors = []
     for error in exc.errors():
@@ -153,7 +152,7 @@ async def validation_exception_handler(
             "message": error["msg"],
             "type": error["type"],
         })
-    
+
     logger.warning(
         f"Validation error: {len(errors)} field(s) failed validation",
         extra={
@@ -161,7 +160,7 @@ async def validation_exception_handler(
             "errors": errors,
         },
     )
-    
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=create_error_response(
@@ -176,7 +175,7 @@ async def validation_exception_handler(
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unexpected exceptions."""
     request_id = getattr(request.state, "request_id", None)
-    
+
     logger.error(
         f"Unexpected error: {type(exc).__name__}: {exc}",
         extra={
@@ -185,7 +184,7 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
         },
         exc_info=True,
     )
-    
+
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=create_error_response(

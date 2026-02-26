@@ -8,7 +8,6 @@ Validation functions for Colombian legal entities:
 """
 
 import re
-from typing import Optional
 
 
 def validate_nit_check_digit(nit: str) -> bool:
@@ -40,26 +39,26 @@ def validate_nit_check_digit(nit: str) -> bool:
     """
     # Extract digits only
     digits = re.sub(r'\D', '', nit)
-    
+
     if len(digits) != 10:
         return False
-    
+
     # Weights for each position
     weights = [41, 37, 29, 23, 19, 17, 13, 7, 3]
-    
+
     # Calculate weighted sum
     total = sum(
-        int(d) * w 
+        int(d) * w
         for d, w in zip(digits[:9], weights)
     )
-    
+
     # Calculate check digit
     check = (11 - (total % 11)) % 11
-    
+
     # If result >= 10, check digit is 0
     if check >= 10:
         check = 0
-    
+
     return check == int(digits[9])
 
 
@@ -85,15 +84,15 @@ def validate_radicado_structure(radicado: str) -> bool:
     """
     # Extract digits only
     digits = re.sub(r'\D', '', radicado)
-    
+
     if len(digits) != 23:
         return False
-    
+
     # Validate year (reasonable range)
     year = int(digits[0:4])
     if not (2000 <= year <= 2030):
         return False
-    
+
     # All should be digits (already checked by regex)
     return True
 
@@ -114,11 +113,11 @@ def validate_cedula_format(cedula: str) -> bool:
     """
     # Extract digits only
     digits = re.sub(r'\D', '', cedula)
-    
+
     # Check length
     if not (6 <= len(digits) <= 12):
         return False
-    
+
     # Check all digits
     return digits.isdigit()
 
@@ -137,14 +136,14 @@ def normalize_radicado(radicado: str) -> str:
     """
     # Remove all non-digits
     digits = re.sub(r'\D', '', radicado)
-    
+
     if len(digits) == 23:
         # Format: YYYY-NNNNN-PP-CCCC-SSS (complete 23 digits)
         return (
             f"{digits[0:4]}-{digits[4:9]}-{digits[9:11]}-"
             f"{digits[11:15]}-{digits[15:23]}"
         )
-    
+
     # Return as-is if not 23 digits
     return digits
 
@@ -163,11 +162,11 @@ def normalize_nit(nit: str) -> str:
     """
     # Extract digits
     digits = re.sub(r'\D', '', nit)
-    
+
     if len(digits) == 10:
         # Format with hyphen
         return f"{digits[0:9]}-{digits[9]}"
-    
+
     return digits
 
 
@@ -201,17 +200,17 @@ def normalize_name(name: str) -> str:
         Normalized name
     """
     import unicodedata
-    
+
     # Normalize unicode
     name = unicodedata.normalize('NFKD', name)
-    
+
     # Uppercase and clean whitespace
     name = ' '.join(name.upper().split())
-    
+
     return name
 
 
-def extract_nit_parts(nit: str) -> Optional[tuple[str, str]]:
+def extract_nit_parts(nit: str) -> tuple[str, str] | None:
     """
     Extract NIT parts (base and check digit).
     
@@ -222,8 +221,8 @@ def extract_nit_parts(nit: str) -> Optional[tuple[str, str]]:
         Tuple of (base, check_digit) or None if invalid
     """
     digits = re.sub(r'\D', '', nit)
-    
+
     if len(digits) == 10:
         return (digits[:9], digits[9])
-    
+
     return None

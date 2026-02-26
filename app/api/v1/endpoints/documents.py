@@ -13,8 +13,8 @@ from typing import Annotated
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.services.ocr import SmartOCRService, OCRResult
-from app.services.parser import ColombianEntityParser, ParseResult
+from app.services.ocr import SmartOCRService
+from app.services.parser import ColombianEntityParser
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class EntityResponse(BaseModel):
             }
         }
     )
-    
+
     type: str
     raw: str
     normalized: str
@@ -101,7 +101,7 @@ class DocumentProcessResponse(BaseModel):
             }
         }
     )
-    
+
     success: bool
     ocr: OCRResponse | None = None
     parse: ParseResponse | None = None
@@ -120,7 +120,7 @@ class TextParseRequest(BaseModel):
             }
         }
     )
-    
+
     text: str = Field(..., min_length=10, description="Text to parse for entities")
 
 
@@ -162,7 +162,7 @@ async def process_document(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Only PDF files are supported",
         )
-    
+
     # Check file size (50MB limit)
     content = await file.read()
     if len(content) > 50 * 1024 * 1024:
@@ -170,24 +170,24 @@ async def process_document(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail="File size exceeds 50MB limit",
         )
-    
+
     try:
         # Initialize services
         ocr_service = SmartOCRService()
         parser = ColombianEntityParser()
-        
+
         # Process OCR
         logger.info(f"Processing document: {file.filename}")
         ocr_result = await ocr_service.extract_text_from_bytes(content)
-        
+
         # Parse entities
         parse_result = parser.parse(ocr_result.text)
-        
+
         logger.info(
             f"Document processed: {ocr_result.word_count} words, "
             f"{parse_result.entity_count} entities"
         )
-        
+
         return DocumentProcessResponse(
             success=True,
             ocr=OCRResponse(
@@ -220,7 +220,7 @@ async def process_document(
                 },
             ),
         )
-        
+
     except Exception as e:
         logger.error(f"Error processing document: {e}")
         return DocumentProcessResponse(
@@ -249,7 +249,7 @@ async def parse_text(request: TextParseRequest) -> TextParseResponse:
     try:
         parser = ColombianEntityParser()
         result = parser.parse(request.text)
-        
+
         return TextParseResponse(
             success=True,
             result=ParseResponse(
@@ -274,7 +274,7 @@ async def parse_text(request: TextParseRequest) -> TextParseResponse:
                 },
             ),
         )
-        
+
     except Exception as e:
         logger.error(f"Error parsing text: {e}")
         return TextParseResponse(

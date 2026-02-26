@@ -9,18 +9,18 @@ Main application module that configures:
 """
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.router import api_router
 from app.config import settings
 from app.database import check_database_connection, close_db, init_db
-from app.redis_client import check_redis_connection, close_redis
-from app.api.v1.router import api_router
-from app.middleware import RequestLoggingMiddleware, SlowRequestMiddleware, RateLimitMiddleware
 from app.exceptions import register_exception_handlers
+from app.middleware import RateLimitMiddleware, RequestLoggingMiddleware, SlowRequestMiddleware
+from app.redis_client import check_redis_connection, close_redis
 
 # Configure logging
 logging.basicConfig(
@@ -45,14 +45,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     # Startup
     logger.info(f"Starting {settings.app_name} in {settings.app_env} mode")
-    
+
     # Initialize database (for development/testing)
     if settings.is_development:
         logger.info("Initializing database tables")
         await init_db()
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down application")
     await close_db()
@@ -185,13 +185,13 @@ async def readiness_check() -> dict:
     """Readiness check endpoint for Kubernetes."""
     # Check database connectivity
     db_healthy = await check_database_connection()
-    
+
     # Check Redis connectivity
     redis_healthy = await check_redis_connection()
-    
+
     # Determine overall status
     all_healthy = db_healthy and redis_healthy
-    
+
     return {
         "status": "ready" if all_healthy else "not_ready",
         "checks": {
@@ -203,7 +203,7 @@ async def readiness_check() -> dict:
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",

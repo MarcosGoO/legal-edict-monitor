@@ -45,7 +45,7 @@ COLOMBIAN_PATTERNS: list[EntityPattern] = [
         description="23-digit case number (continuous)",
         example="20230012345678901234567",
     ),
-    
+
     # ========================================================================
     # NIT: Tax identification number
     # Format: 123456789-0 or 1234567890
@@ -63,7 +63,7 @@ COLOMBIAN_PATTERNS: list[EntityPattern] = [
         description="NIT format without label",
         example="900123456-7",
     ),
-    
+
     # ========================================================================
     # CÉDULA: Colombian ID (6-12 digits)
     # Often appears with prefixes like CC, C.C., Cédula
@@ -85,7 +85,7 @@ COLOMBIAN_PATTERNS: list[EntityPattern] = [
         description="Cédula in identification context",
         example="identificado con CC 12345678",
     ),
-    
+
     # ========================================================================
     # COURT ID: Court identifiers
     # Format: Juzgado X, Tribunal Y, Sala Z, etc.
@@ -125,15 +125,15 @@ def compile_patterns() -> dict[EntityType, list[re.Pattern]]:
         Dictionary mapping entity types to compiled patterns
     """
     compiled: dict[EntityType, list[re.Pattern]] = {}
-    
+
     for pattern in COLOMBIAN_PATTERNS:
         if pattern.entity_type not in compiled:
             compiled[pattern.entity_type] = []
-        
+
         compiled[pattern.entity_type].append(
             re.compile(pattern.pattern, re.IGNORECASE | re.MULTILINE)
         )
-    
+
     return compiled
 
 
@@ -145,10 +145,10 @@ def get_pattern_examples() -> dict[EntityType, list[str]]:
         Dictionary mapping entity types to example lists
     """
     examples: dict[EntityType, list[str]] = {}
-    
+
     for pattern in COLOMBIAN_PATTERNS:
         if pattern.entity_type not in examples:
             examples[pattern.entity_type] = []
         examples[pattern.entity_type].append(pattern.example)
-    
+
     return examples

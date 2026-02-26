@@ -9,8 +9,8 @@ This package contains the core business logic services:
 - Notifier: Notification dispatch
 """
 
-from app.services.ocr import SmartOCRService, OCRResult, OCREngine
-from app.services.parser import ColombianEntityParser, ParseResult, EntityType
+from app.services.ocr import OCREngine, OCRResult, SmartOCRService
+from app.services.parser import ColombianEntityParser, EntityType, ParseResult
 
 __all__ = [
     "SmartOCRService",

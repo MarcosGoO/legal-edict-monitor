@@ -6,7 +6,7 @@ Colombian document numbers in API requests.
 """
 
 import re
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import BeforeValidator, Field
 
@@ -26,16 +26,16 @@ def validate_colombian_cedula(value: str) -> str:
     """
     if not value:
         return value
-    
+
     # Extract digits
     digits = re.sub(r'\D', '', value)
-    
+
     # Validate length
     if not (6 <= len(digits) <= 12):
         raise ValueError(
             f"Cédula must have 6-12 digits, got {len(digits)}"
         )
-    
+
     return digits
 
 
@@ -54,28 +54,28 @@ def validate_colombian_nit(value: str) -> str:
     """
     if not value:
         return value
-    
+
     # Extract digits
     digits = re.sub(r'\D', '', value)
-    
+
     # Validate length
     if len(digits) != 10:
         raise ValueError(
             f"NIT must have 10 digits (9 + check digit), got {len(digits)}"
         )
-    
+
     # Validate check digit
     weights = [41, 37, 29, 23, 19, 17, 13, 7, 3]
     total = sum(int(d) * w for d, w in zip(digits[:9], weights))
     check = (11 - (total % 11)) % 11
     if check >= 10:
         check = 0
-    
+
     if check != int(digits[9]):
         raise ValueError(
             f"Invalid NIT check digit. Expected {check}, got {digits[9]}"
         )
-    
+
     # Return normalized format
     return f"{digits[:9]}-{digits[9]}"
 
@@ -95,23 +95,23 @@ def validate_colombian_radicado(value: str) -> str:
     """
     if not value:
         return value
-    
+
     # Extract digits
     digits = re.sub(r'\D', '', value)
-    
+
     # Validate length
     if len(digits) != 23:
         raise ValueError(
             f"Radicado must have 23 digits, got {len(digits)}"
         )
-    
+
     # Validate year
     year = int(digits[0:4])
     if not (2000 <= year <= 2030):
         raise ValueError(
             f"Invalid radicado year: {year}. Must be between 2000 and 2030"
         )
-    
+
     # Return normalized format
     return (
         f"{digits[0:4]}-{digits[4:9]}-{digits[9:11]}-"
@@ -134,16 +134,16 @@ def validate_document_type(value: str) -> str:
     """
     if not value:
         return value
-    
+
     valid_types = {"CC", "CE", "NIT", "PP", "TI"}
     upper_value = value.upper()
-    
+
     if upper_value not in valid_types:
         raise ValueError(
             f"Invalid document type: {value}. "
             f"Must be one of: {', '.join(sorted(valid_types))}"
         )
-    
+
     return upper_value
 
 
@@ -189,9 +189,9 @@ def validate_document_number(document_type: str, document_number: str) -> str:
     """
     if not document_number:
         return document_number
-    
+
     doc_type = document_type.upper() if document_type else ""
-    
+
     if doc_type == "CC":
         return validate_colombian_cedula(document_number)
     elif doc_type == "NIT":
@@ -199,6 +199,6 @@ def validate_document_number(document_type: str, document_number: str) -> str:
     elif doc_type in {"CE", "PP", "TI"}:
         # For these types, just clean and return
         return re.sub(r'\D', '', document_number)
-    
+
     # Unknown type, return as-is
     return document_number

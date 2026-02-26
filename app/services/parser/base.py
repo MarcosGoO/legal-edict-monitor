@@ -37,12 +37,12 @@ class ExtractedEntity:
     end_pos: int
     context: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
-    
+
     @property
     def is_high_confidence(self) -> bool:
         """Check if confidence is above threshold."""
         return self.confidence >= 0.8
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
@@ -54,7 +54,7 @@ class ExtractedEntity:
             "context": self.context[:100] if self.context else "",
             "metadata": self.metadata,
         }
-    
+
     def __repr__(self) -> str:
         return (
             f"<ExtractedEntity(type={self.entity_type.value}, "
@@ -74,41 +74,41 @@ class ParseResult:
     text_length: int
     processing_time_ms: float
     nlp_model: str
-    
+
     @property
     def radicados(self) -> list[ExtractedEntity]:
         """Get all radicado entities."""
         return [e for e in self.entities if e.entity_type == EntityType.RADICADO]
-    
+
     @property
     def nits(self) -> list[ExtractedEntity]:
         """Get all NIT entities."""
         return [e for e in self.entities if e.entity_type == EntityType.NIT]
-    
+
     @property
     def cedulas(self) -> list[ExtractedEntity]:
         """Get all cédula entities."""
         return [e for e in self.entities if e.entity_type == EntityType.CEDULA]
-    
+
     @property
     def names(self) -> list[ExtractedEntity]:
         """Get all name entities."""
         return [e for e in self.entities if e.entity_type == EntityType.NOMBRE]
-    
+
     @property
     def court_ids(self) -> list[ExtractedEntity]:
         """Get all court ID entities."""
         return [e for e in self.entities if e.entity_type == EntityType.COURT_ID]
-    
+
     @property
     def entity_count(self) -> int:
         """Total number of entities."""
         return len(self.entities)
-    
+
     def get_entities_by_type(self, entity_type: EntityType) -> list[ExtractedEntity]:
         """Get entities of a specific type."""
         return [e for e in self.entities if e.entity_type == entity_type]
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {

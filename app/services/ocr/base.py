@@ -32,23 +32,23 @@ class OCRResult:
     pages_processed: int
     is_searchable: bool
     metadata: dict[str, Any] = field(default_factory=dict)
-    
+
     @property
     def word_count(self) -> int:
         """Count words in extracted text."""
         return len(self.text.split())
-    
+
     @property
     def character_count(self) -> int:
         """Count characters in extracted text."""
         return len(self.text)
-    
+
     @property
     def is_quality_acceptable(self) -> bool:
         """Check if extraction quality meets minimum threshold."""
         # Minimum 50 words and confidence >= 0.7
         return self.confidence >= 0.7 and self.word_count >= 50
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
@@ -61,7 +61,7 @@ class OCRResult:
             "is_searchable": self.is_searchable,
             "metadata": self.metadata,
         }
-    
+
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "OCRResult":
         """Create OCRResult from dictionary."""
@@ -88,12 +88,12 @@ class PDFAnalysis:
     estimated_quality: float
     recommended_engine: OCREngine
     text_sample: str = ""
-    
+
     @property
     def needs_ocr(self) -> bool:
         """Check if OCR is needed."""
         return not self.has_text_layer or self.is_scanned
-    
+
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -112,7 +112,7 @@ class OCREngineBase(ABC):
     All OCR engine implementations must inherit from this class
     and implement the extract_text method.
     """
-    
+
     @abstractmethod
     async def extract_text(self, pdf_path: Path) -> OCRResult:
         """
@@ -125,7 +125,7 @@ class OCREngineBase(ABC):
             OCRResult with extracted text and metadata
         """
         pass
-    
+
     @abstractmethod
     async def is_available(self) -> bool:
         """
@@ -135,7 +135,7 @@ class OCREngineBase(ABC):
             True if the engine can be used, False otherwise
         """
         pass
-    
+
     def _calculate_confidence(self, text: str, char_count: int, word_count: int) -> float:
         """
         Calculate a confidence score based on text characteristics.
@@ -150,10 +150,10 @@ class OCREngineBase(ABC):
         """
         if not text or char_count == 0:
             return 0.0
-        
+
         # Base confidence on text density
         avg_word_length = char_count / max(word_count, 1)
-        
+
         # Typical Spanish word length is 4-6 characters
         if 3 <= avg_word_length <= 8:
             length_score = 1.0
@@ -161,12 +161,12 @@ class OCREngineBase(ABC):
             length_score = 0.8
         else:
             length_score = 0.5
-        
+
         # Check for common Spanish words
         common_words = {"de", "la", "el", "en", "que", "y", "a", "del", "se", "los"}
         words = set(text.lower().split())
         common_found = len(words & common_words)
         vocabulary_score = min(common_found / 5, 1.0)
-        
+
         # Combine scores
         return (length_score * 0.5 + vocabulary_score * 0.5)
