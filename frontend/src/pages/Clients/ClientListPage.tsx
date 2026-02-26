@@ -8,12 +8,14 @@ import { FullPageSpinner } from '../../components/ui/LoadingSpinner'
 import ClientFilters from './components/ClientFilters'
 import ClientTable from './components/ClientTable'
 import { useClientList, useDeleteClient } from '../../hooks/useClients'
+import { useToast } from '../../components/ui/Toast'
 import type { ClientResponse } from '../../types/api'
 
 type ActiveFilter = 'all' | 'active' | 'inactive'
 
 export default function ClientListPage() {
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)

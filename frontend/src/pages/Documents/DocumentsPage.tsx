@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import * as Tabs from '@radix-ui/react-tabs'
 import { FileText, AlignLeft } from 'lucide-react'
 import { Card, CardBody } from '../../components/ui/Card'
 import PdfUploadTab from './components/PdfUploadTab'
 import TextParseTab from './components/TextParseTab'
 import ProcessingState from './components/ProcessingState'
+import ResultsPanel from './components/ResultsPanel'
 import { useProcessDocument, useParseText } from '../../hooks/useDocumentProcessing'
 import type { DocumentProcessResponse, TextParseResponse } from '../../types/api'
-import { useState } from 'react'
 
 const tabTriggerCls =
   'flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ' +
@@ -37,9 +38,13 @@ export default function DocumentsPage() {
     (activeTab === 'pdf' && pdfMutation.isPending) ||
     (activeTab === 'text' && textMutation.isPending)
 
-  const result = activeTab === 'pdf' ? pdfResult : textResult?.result
-    ? { success: textResult.success, parse: textResult.result, ocr: null, error: textResult.error }
-    : null
+  // Normalise text result into DocumentProcessResponse shape for ResultsPanel
+  const result: DocumentProcessResponse | null =
+    activeTab === 'pdf'
+      ? pdfResult
+      : textResult
+      ? { success: textResult.success, parse: textResult.result, ocr: null, error: textResult.error }
+      : null
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">
@@ -51,10 +56,7 @@ export default function DocumentsPage() {
       </div>
 
       <Card>
-        <Tabs.Root
-          value={activeTab}
-          onValueChange={(v) => setActiveTab(v as 'pdf' | 'text')}
-        >
+        <Tabs.Root value={activeTab} onValueChange={(v) => setActiveTab(v as 'pdf' | 'text')}>
           <Tabs.List className="flex border-b border-slate-200 px-5 pt-4">
             <Tabs.Trigger value="pdf" className={`focus:outline-none ${tabTriggerCls}`}>
               <FileText className="w-4 h-4" />
@@ -85,48 +87,7 @@ export default function DocumentsPage() {
         )}
       </Card>
 
-      {/* Results area — populated in Task 9 */}
-      {result && !isLoading && (
-        <ResultsPlaceholder result={result} />
-      )}
+      {result && !isLoading && <ResultsPanel result={result} />}
     </div>
-  )
-}
-
-// Temporary placeholder — replaced with full ResultsPanel in Task 9
-function ResultsPlaceholder({ result }: { result: DocumentProcessResponse }) {
-  if (!result.success || !result.parse) {
-    return (
-      <Card>
-        <CardBody>
-          <div className="flex items-center gap-2 text-red-600 text-sm">
-            <span className="font-medium">Error:</span>
-            <span>{result.error ?? 'No se pudo procesar el documento.'}</span>
-          </div>
-        </CardBody>
-      </Card>
-    )
-  }
-
-  return (
-    <Card>
-      <CardBody>
-        <p className="text-sm font-semibold text-slate-700 mb-2">
-          {result.parse.entity_count} entidad{result.parse.entity_count !== 1 ? 'es' : ''} encontrada{result.parse.entity_count !== 1 ? 's' : ''}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(result.parse.summary).map(([type, count]) =>
-            count > 0 ? (
-              <span key={type} className="px-2.5 py-1 bg-slate-100 rounded-full text-xs font-medium text-slate-700">
-                {count} {type}
-              </span>
-            ) : null,
-          )}
-        </div>
-        <p className="text-xs text-slate-400 mt-3">
-          Los resultados detallados aparecerán aquí en la próxima tarea de desarrollo.
-        </p>
-      </CardBody>
-    </Card>
   )
 }

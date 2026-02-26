@@ -1,22 +1,29 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import { AlertCircle } from 'lucide-react'
 import { Card, CardHeader, CardBody } from '../../components/ui/Card'
 import ClientForm from './components/ClientForm'
 import { FullPageSpinner } from '../../components/ui/LoadingSpinner'
 import EmptyState from '../../components/ui/EmptyState'
 import { useClient, useUpdateClient } from '../../hooks/useClients'
-import { AlertCircle } from 'lucide-react'
+import { useToast } from '../../components/ui/Toast'
 import type { ClientCreate } from '../../types/api'
 
 export default function EditClientPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { toast } = useToast()
 
   const { data: client, isLoading, isError } = useClient(id!)
   const mutation = useUpdateClient(id!)
 
   const handleSubmit = async (data: ClientCreate) => {
-    await mutation.mutateAsync(data)
-    navigate(`/clients/${id}`)
+    try {
+      await mutation.mutateAsync(data)
+      toast('Cambios guardados correctamente', 'success')
+      navigate(`/clients/${id}`)
+    } catch (err) {
+      toast((err as Error)?.message ?? 'Error al guardar los cambios', 'error')
+    }
   }
 
   if (isLoading) return <FullPageSpinner />
@@ -48,16 +55,7 @@ export default function EditClientPage() {
       <Card>
         <CardHeader title="Datos del cliente" />
         <CardBody>
-          <ClientForm
-            defaultValues={client}
-            onSubmit={handleSubmit}
-            isLoading={mutation.isPending}
-          />
-          {mutation.isError && (
-            <p className="mt-3 text-sm text-red-600">
-              {(mutation.error as Error)?.message ?? 'Error al guardar los cambios'}
-            </p>
-          )}
+          <ClientForm defaultValues={client} onSubmit={handleSubmit} isLoading={mutation.isPending} />
         </CardBody>
       </Card>
     </div>
