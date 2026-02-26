@@ -4,7 +4,7 @@ services:
     runtime: python
     region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt && python -m spacy download es_core_news_sm
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python -m spacy download es_core_news_sm
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
