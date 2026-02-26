@@ -4,6 +4,8 @@ import DashboardPage from './pages/Dashboard/DashboardPage'
 import ClientListPage from './pages/Clients/ClientListPage'
 import CreateClientPage from './pages/Clients/CreateClientPage'
 import EditClientPage from './pages/Clients/EditClientPage'
+import ClientDetailPage from './pages/Clients/ClientDetailPage'
+import DocumentsPage from './pages/Documents/DocumentsPage'
 
 function App() {
   return (
@@ -13,8 +15,9 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/clients" element={<ClientListPage />} />
           <Route path="/clients/new" element={<CreateClientPage />} />
+          <Route path="/clients/:id" element={<ClientDetailPage />} />
           <Route path="/clients/:id/edit" element={<EditClientPage />} />
-          {/* /clients/:id and /documents added in next tasks */}
+          <Route path="/documents" element={<DocumentsPage />} />
         </Route>
       </Routes>
     </HashRouter>
