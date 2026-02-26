@@ -2,7 +2,6 @@ services:
   - type: web
     name: edict-guardian-api
     runtime: python
-    pythonVersion: "3.11.0"
     region: oregon
     plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python -m spacy download es_core_news_sm
