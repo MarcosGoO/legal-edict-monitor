@@ -10,7 +10,7 @@
 
 Extrae entidades legales (radicados, NITs, cédulas, nombres, juzgados) de documentos PDF mediante OCR y NLP especializado en español, y las cruza contra listas de vigilancia de clientes para generar alertas automáticas.
 
-🌐 **[Ver demo en vivo](https://MarcosGoO.github.io/legal-edict-monitor/)** · 📖 **[API Docs](https://edict-guardian-api.onrender.com/docs)**
+🌐 **[Ver demo en vivo](https://MarcosGoO.github.io/legal-edict-monitor/)** · 📖 **[API Docs](https://legal-edict-monitor.onrender.com/docs)**
 
 ---
 
