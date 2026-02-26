@@ -100,18 +100,18 @@ def validate_radicado_structure(radicado: str) -> bool:
 
 def validate_cedula_format(cedula: str) -> bool:
     """
-    Validate Cédula format.
+    Validate Cédula de Ciudadanía format and check digit.
     
     Colombian Cédula de Ciudadanía:
     - Length: 6-12 digits
     - All numeric
-    - No check digit algorithm (unlike NIT)
+    - Check digit algorithm (mod 10) for valid formats
     
     Args:
         cedula: Cédula string
         
     Returns:
-        True if format is valid
+        True if format and check digit are valid
     """
     # Extract digits only
     digits = re.sub(r'\D', '', cedula)
@@ -120,7 +120,22 @@ def validate_cedula_format(cedula: str) -> bool:
     if not (6 <= len(digits) <= 12):
         return False
     
-    # Check all digits
+    # For valid formats, check digit algorithm applies to 7-10 digit numbers
+    if 7 <= len(digits) <= 10:
+        # Calculate check digit
+        total = 0
+        reverse_digits = digits[:-1][::-1]
+        
+        for i, digit in enumerate(reverse_digits):
+            multiplier = (i % 2) + 1
+            product = int(digit) * multiplier
+            
+            total += product if product < 10 else product - 9
+        
+        check_digit = (10 - (total % 10)) % 10
+        
+        return check_digit == int(digits[-1])
+    
     return digits.isdigit()
 
 
@@ -140,10 +155,10 @@ def normalize_radicado(radicado: str) -> str:
     digits = re.sub(r'\D', '', radicado)
     
     if len(digits) == 23:
-        # Format: YYYY-NNNNN-PP-CCCC-SSS
+        # Format: YYYY-NNNNN-PP-CCCC-SSS (complete 23 digits)
         return (
             f"{digits[0:4]}-{digits[4:9]}-{digits[9:11]}-"
-            f"{digits[11:15]}-{digits[15:18]}"
+            f"{digits[11:15]}-{digits[15:23]}"
         )
     
     # Return as-is if not 23 digits

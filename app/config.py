@@ -141,11 +141,10 @@ class Settings(BaseSettings):
     # =========================================================================
     # CORS
     # =========================================================================
-    allowed_origins: str = "http://localhost:3000,http://localhost:8000"
-    
-    @property
-    def cors_origins(self) -> list[str]:
-        return [origin.strip() for origin in self.allowed_origins.split(",")]
+    cors_origins: list[str] = Field(
+        default=["http://localhost:3000", "http://localhost:8000"],
+        description="List of allowed CORS origins"
+    )
 
 
 @lru_cache
