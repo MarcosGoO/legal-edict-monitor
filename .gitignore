@@ -329,3 +329,11 @@ docker-compose.override.yml
 local.py
 plans/architecture.md
 plans/processing-pipeline.md
+
+# -----------------------------------------------------------------------------
+# Frontend
+# -----------------------------------------------------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.env.development
+frontend/.env.production
