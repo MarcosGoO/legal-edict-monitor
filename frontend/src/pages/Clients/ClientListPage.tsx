@@ -47,7 +47,12 @@ export default function ClientListPage() {
 
   const handleDeleteConfirm = async () => {
     if (!toDelete) return
-    await deleteMutation.mutateAsync(toDelete.id)
+    try {
+      await deleteMutation.mutateAsync(toDelete.id)
+      toast(`"${toDelete.full_name}" eliminado`, 'success')
+    } catch (err) {
+      toast((err as Error)?.message ?? 'Error al eliminar el cliente', 'error')
+    }
     setToDelete(null)
   }
 

@@ -6,6 +6,7 @@ import CreateClientPage from './pages/Clients/CreateClientPage'
 import EditClientPage from './pages/Clients/EditClientPage'
 import ClientDetailPage from './pages/Clients/ClientDetailPage'
 import DocumentsPage from './pages/Documents/DocumentsPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/clients/:id" element={<ClientDetailPage />} />
           <Route path="/clients/:id/edit" element={<EditClientPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </HashRouter>
