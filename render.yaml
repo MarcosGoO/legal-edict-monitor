@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: edict-guardian-api
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt && python -m spacy download es_core_news_sm
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: LOG_FORMAT
+        value: text
+      - key: SPACY_MODEL
+        value: es_core_news_sm
+      - key: ENABLE_TEXTRACT_FALLBACK
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      # --- Set these manually in Render dashboard after deploy ---
+      # DATABASE_URL  → Neon connection string (postgresql+asyncpg://...)
+      # REDIS_URL     → Upstash Redis URL (rediss://...)
+      # CORS_ORIGINS  → ["https://<tu-usuario>.github.io"]
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false

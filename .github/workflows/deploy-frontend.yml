@@ -37,7 +37,7 @@ jobs:
         working-directory: frontend
         env:
           # Set via GitHub repo Settings → Secrets and variables → Actions
-          # Name: VITE_API_URL  Value: https://your-api-url.com
+          # Name: VITE_API_URL  Value: https://edict-guardian-api.onrender.com
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Deploy to GitHub Pages
