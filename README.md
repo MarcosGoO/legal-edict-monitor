@@ -1,202 +1,209 @@
 # Edict Guardian
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Deploy Frontend](https://github.com/MarcosGoO/legal-edict-monitor/actions/workflows/deploy-frontend.yml/badge.svg)](https://github.com/MarcosGoO/legal-edict-monitor/actions/workflows/deploy-frontend.yml)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-green.svg)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://react.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-orange.svg)](https://github.com/astral-sh/ruff)
 
-**Mission-critical backend for scraping, processing, and analyzing Colombian legal gazettes and court edicts to provide real-time alerts to lawyers.**
+**Herramienta de monitoreo de edictos judiciales colombianos para firmas de abogados.**
 
-## Overview
+Extrae entidades legales (radicados, NITs, cédulas, nombres, juzgados) de documentos PDF mediante OCR y NLP especializado en español, y las cruza contra listas de vigilancia de clientes para generar alertas automáticas.
 
-Edict Guardian monitors official Colombian court portals, extracts legal entities from PDF documents using OCR and NLP, and notifies law firms when their clients are mentioned in legal proceedings.
+🌐 **[Ver demo en vivo](https://MarcosGoO.github.io/legal-edict-monitor/)** · 📖 **[API Docs](https://edict-guardian-api.onrender.com/docs)**
 
-### Key Features
+---
 
-- **Smart OCR Pipeline** - Multi-engine OCR with automatic fallback (Native → Tesseract → AWS Textract)
-- **Colombian Entity Extraction** - Specialized parser for Radicados, NITs, Cédulas, and names
-- **Real-time Matching** - High-efficiency watchlist matching engine
-- **Multi-channel Notifications** - WhatsApp, Email, and SMS alerts
-- **Idempotent Processing** - Deduplication at every layer
+## Stack
 
-## Architecture
+| Capa | Tecnología |
+| ---- | ---------- |
+| Frontend | React 18 + Vite + TypeScript + Tailwind CSS + Radix UI |
+| Backend | FastAPI + SQLAlchemy (async) + Pydantic v2 |
+| OCR | PyMuPDF (nativo) → Tesseract → AWS Textract (fallback) |
+| NLP | spaCy `es_core_news_sm` + regex patterns colombianos |
+| Base de datos | PostgreSQL (Neon) |
+| Caché | Redis (Upstash) |
+| Deploy | GitHub Pages (frontend) + Render (backend, Docker) |
 
-```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  Court Portals  │────▶│  Ingestion Engine │────▶│  Smart OCR      │
-│  (Rama Judicial)│     │  (Celery Crawler) │     │  (Tesseract)    │
-└─────────────────┘     └──────────────────┘     └────────┬────────┘
-                                                          │
-┌─────────────────┐     ┌──────────────────┐     ┌───────▼─────────┐
-│   WhatsApp/     │◀────│  Match & Alert   │◀────│  Entity Parser  │
-│   Email/SMS     │     │  Engine          │     │  (spaCy NER)    │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
-```
+---
 
-## Quick Start
+## Funcionalidades
 
-### Prerequisites
+### Procesamiento de documentos
 
+- **Upload PDF** con drag & drop — extrae texto vía OCR multi-engine
+- **Paste de texto** — análisis directo con NLP
+- Detección de 5 tipos de entidades legales colombianas:
+  - **Radicado** — número de proceso (23 dígitos)
+  - **NIT** — identificación tributaria empresarial
+  - **Cédula** — documento de identidad personal
+  - **Nombre** — personas naturales
+  - **Juzgado** — despacho judicial
+
+### Gestión de clientes
+
+- CRUD completo de clientes con validación
+- Listas de vigilancia por cliente (radicados + juzgados)
+- Canales de notificación configurables (email / WhatsApp)
+
+### Dashboard
+
+- Estado en tiempo real del sistema (API, BD, Redis)
+- Accesos rápidos a las funciones principales
+
+---
+
+## Correr localmente
+
+### Requisitos
+
+- Docker Desktop (para Postgres + Redis)
 - Python 3.11+
-- PostgreSQL 15+
-- Redis 7+
-- Tesseract OCR (with Spanish language pack)
+- Node.js 20+
 
-### Installation
+### 1. Servicios de infraestructura
 
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/edict-guardian.git
-cd edict-guardian
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -e ".[dev]"
-
-# Install spaCy Spanish model
-python -m spacy download es_core_news_lg
-
-# Copy environment template
-cp .env.example .env
-# Edit .env with your configuration
+docker-compose up -d
 ```
 
-### Running the Application
+### 2. Backend
 
 ```bash
-# Start the API server
-uvicorn app.main:app --reload
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
-# Start the Celery worker (in another terminal)
-celery -A app.workers.celery_app worker --loglevel=info
+pip install -r requirements.txt
+python -m spacy download es_core_news_sm
 
-# Start the Celery beat scheduler (in another terminal)
-celery -A app.workers.celery_app beat --loglevel=info
+uvicorn app.main:app --reload --port 8000
 ```
 
-The API documentation will be available at `http://localhost:8000/docs`
+API en `http://localhost:8000` · Docs en `http://localhost:8000/docs`
 
-## Database Schema
-
-The system uses PostgreSQL with the following core tables:
-
-| Table | Description |
-|-------|-------------|
-| `law_firms` | Law firm accounts |
-| `users` | Law firm staff members |
-| `clients` | People/entities to monitor |
-| `watchlist_entries` | Monitoring configurations |
-| `raw_documents` | Ingested PDF documents |
-| `extracted_entities` | Entities found in documents |
-| `detected_edicts` | Matched edicts |
-| `notifications` | Notification records |
-
-See [plans/architecture.md](plans/architecture.md) for the complete schema.
-
-## API Endpoints
-
-### Document Processing
+### 3. Frontend
 
 ```bash
-# Process a PDF document
-curl -X POST "http://localhost:8000/api/v1/documents/process" \
-  -H "Content-Type: multipart/form-data" \
-  -F "file=@document.pdf"
-
-# Parse text for entities
-curl -X POST "http://localhost:8000/api/v1/documents/parse-text" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Radicado 2023-00123-45-67-890-12..."}'
+cd frontend
+npm install
+npm run dev
 ```
 
-### Client Management
+UI en `http://localhost:3000`
+
+---
+
+## Deploy en producción (stack gratuito permanente)
+
+| Servicio | Plataforma | Tier |
+| -------- | ---------- | ---- |
+| Frontend | GitHub Pages | Gratis ∞ |
+| Backend | Render (Docker) | Gratis ∞* |
+| PostgreSQL | Neon | Gratis ∞ |
+| Redis | Upstash | Gratis ∞ |
+
+*Render free hace spin-down tras 15 min de inactividad (~30s en primera request).
+
+### Pasos
+
+1. **Neon** — crear proyecto PostgreSQL, copiar connection string
+2. **Upstash** — crear Redis Regional, copiar URL TLS
+3. **Render** — conectar repo, runtime Docker, agregar env vars:
+   - `DATABASE_URL` → `postgresql+asyncpg://...neon.tech/...?ssl=true`
+   - `REDIS_URL` → `rediss://...upstash.io:6379`
+   - `CORS_ORIGINS` → `["https://MarcosGoO.github.io"]`
+   - `SECRET_KEY` y `JWT_SECRET_KEY` → strings aleatorios de 32+ chars
+4. **GitHub Secret** → `VITE_API_URL` = URL del servicio Render
+5. Push a `main` → GitHub Actions despliega el frontend automáticamente
+
+---
+
+## Estructura del proyecto
+
+```text
+legal-edict-monitor/
+├── app/                          # Backend FastAPI
+│   ├── api/v1/endpoints/         # Endpoints REST
+│   │   ├── clients.py            # CRUD clientes + watchlist
+│   │   └── documents.py          # OCR + NLP processing
+│   ├── models/                   # SQLAlchemy ORM
+│   ├── services/
+│   │   ├── ocr/                  # Pipeline OCR multi-engine
+│   │   └── parser/               # Extractor de entidades colombianas
+│   ├── config.py                 # Configuración centralizada
+│   ├── database.py               # Engine async + sesiones
+│   └── main.py                   # App FastAPI + lifespan
+├── frontend/                     # Frontend React
+│   └── src/
+│       ├── api/                  # Axios calls tipados
+│       ├── components/
+│       │   ├── layout/           # AppShell, Sidebar, TopBar
+│       │   └── ui/               # Card, Toast, MonoValue, etc.
+│       ├── hooks/                # TanStack Query wrappers
+│       ├── pages/
+│       │   ├── Dashboard/        # Status del sistema
+│       │   ├── Clients/          # Lista, detalle, formularios
+│       │   └── Documents/        # Upload PDF + resultados
+│       └── types/                # Interfaces TypeScript
+├── tests/                        # Test suite (pytest)
+├── Dockerfile                    # Imagen Python 3.11 para Render
+├── docker-compose.yml            # Postgres + Redis para desarrollo local
+├── render.yaml                   # Infra como código para Render
+└── requirements.txt              # Dependencias de producción
+```
+
+---
+
+## API Reference
+
+### Documentos
 
 ```bash
-# List clients
-curl "http://localhost:8000/api/v1/clients"
+# Procesar PDF
+POST /api/v1/documents/process
+# Content-Type: multipart/form-data  |  field: file
 
-# Create a client
-curl -X POST "http://localhost:8000/api/v1/clients" \
-  -H "Content-Type: application/json" \
-  -d '{"full_name": "JOSÉ GARCÍA", "document_type": "CC", "document_number": "12345678"}'
+# Analizar texto
+POST /api/v1/documents/parse-text
+# Body: {"text": "El radicado 11001310300120230012300 corresponde a..."}
 ```
+
+### Clientes
+
+```bash
+GET    /api/v1/clients                 # Listar (paginado, búsqueda)
+POST   /api/v1/clients                 # Crear
+GET    /api/v1/clients/{id}            # Detalle
+PUT    /api/v1/clients/{id}            # Actualizar
+DELETE /api/v1/clients/{id}            # Eliminar
+POST   /api/v1/clients/{id}/watchlist  # Agregar vigilancia
+```
+
+### Health
+
+```bash
+GET /health   # Estado de la API
+GET /ready    # Estado de DB + Redis
+GET /docs     # Swagger UI (solo en development)
+```
+
+---
 
 ## Testing
 
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=app --cov-report=html
-
-# Run specific test file
-pytest tests/test_parser.py -v
+pytest                              # Suite completa
+pytest --cov=app --cov-report=html  # Con cobertura
+pytest tests/test_parser.py -v      # Módulo específico
 ```
-
-## Configuration
-
-Key environment variables (see `.env.example` for full list):
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | Required |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379/0` |
-| `TESSERACT_LANG` | OCR language | `spa` |
-| `SPACY_MODEL` | spaCy model name | `es_core_news_lg` |
-| `TWILIO_ACCOUNT_SID` | Twilio account for WhatsApp/SMS | Optional |
-| `SENDGRID_API_KEY` | SendGrid for email | Optional |
-
-## Project Structure
-
-```
-edict-guardian/
-├── app/
-│   ├── api/v1/endpoints/     # REST API endpoints
-│   ├── models/               # SQLAlchemy ORM models
-│   ├── services/
-│   │   ├── ocr/              # Smart OCR wrapper
-│   │   └── parser/           # Colombian entity parser
-│   ├── config.py             # Settings management
-│   ├── database.py           # Database configuration
-│   └── main.py               # FastAPI application
-├── tests/                    # Test suite
-├── plans/                    # Architecture documentation
-├── pyproject.toml            # Project configuration
-└── .env.example              # Environment template
-```
-
-## Security
-
-- Use `.env.example` as template
-- **API keys and secrets** - Store in AWS Secrets Manager or similar
-- **PII data** - Encrypt sensitive fields in database
-- **Rate limiting** - Implement per-user and per-IP limits
-
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Rama Judicial de Colombia](https://www.ramajudicial.gov.co/) - Public court information
-- [spaCy](https://spacy.io/) - Industrial-strength NLP
-- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) - Open-source OCR engine
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
 
 ---
 
-**⚠️ Disclaimer**: This tool is for informational purposes only. Always verify legal information with official sources. The developers are not responsible for any decisions made based on notifications from this system.
+## Licencia
+
+MIT — ver [LICENSE](LICENSE)
+
+---
+
+> **Aviso**: Esta herramienta es de uso informativo. Verificar siempre la información legal en fuentes oficiales ([Rama Judicial de Colombia](https://www.ramajudicial.gov.co/)).
