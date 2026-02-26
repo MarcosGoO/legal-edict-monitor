@@ -1,8 +1,9 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
-
-// Pages (lazy imports will be added progressively)
 import DashboardPage from './pages/Dashboard/DashboardPage'
+import ClientListPage from './pages/Clients/ClientListPage'
+import CreateClientPage from './pages/Clients/CreateClientPage'
+import EditClientPage from './pages/Clients/EditClientPage'
 
 function App() {
   return (
@@ -10,7 +11,10 @@ function App() {
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/" element={<DashboardPage />} />
-          {/* More routes will be added in future tasks */}
+          <Route path="/clients" element={<ClientListPage />} />
+          <Route path="/clients/new" element={<CreateClientPage />} />
+          <Route path="/clients/:id/edit" element={<EditClientPage />} />
+          {/* /clients/:id and /documents added in next tasks */}
         </Route>
       </Routes>
     </HashRouter>
