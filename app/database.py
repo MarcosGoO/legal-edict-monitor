@@ -11,7 +11,7 @@ This module provides:
 from collections.abc import AsyncGenerator
 from typing import Any
 
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -46,6 +46,11 @@ class Base(DeclarativeBase):
         }
 
 
+# Pass SSL via connect_args for asyncpg compatibility (Neon, Supabase, etc.)
+_connect_args: dict = {}
+if "neon.tech" in settings.database_url or "ssl" in settings.database_url:
+    _connect_args = {"ssl": "require"}
+
 # Create async engine
 engine = create_async_engine(
     settings.async_database_url,
@@ -53,6 +58,7 @@ engine = create_async_engine(
     max_overflow=settings.database_max_overflow,
     echo=settings.debug,
     future=True,
+    connect_args=_connect_args,
 )
 
 # Create session factory
@@ -105,8 +111,7 @@ async def check_database_connection() -> bool:
     """
     try:
         async with engine.connect() as conn:
-            # Execute a simple query to verify connection
-            await conn.execute("SELECT 1")
+            await conn.execute(text("SELECT 1"))
         return True
     except Exception:
         return False
