@@ -261,8 +261,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         call_next: Callable,
     ) -> Response:
         """Process request with rate limiting."""
-        # Skip rate limiting for health checks
-        if request.url.path in ["/health", "/ready"]:
+        # Skip rate limiting for health checks and CORS preflight (OPTIONS)
+        if request.url.path in ["/health", "/ready"] or request.method == "OPTIONS":
             return await call_next(request)
 
         client_ip = self._get_client_ip(request)

@@ -132,7 +132,16 @@ Most endpoints require authentication. Use the `/api/v1/auth/login` endpoint to 
     ],
 )
 
-# Configure CORS
+# Middleware order: add_middleware stacks in REVERSE — last added = outermost = runs first.
+# CORSMiddleware MUST be outermost so it adds Access-Control headers to ALL responses,
+# including error responses from inner middleware (rate limiter, etc.).
+
+# Inner middleware (added first = run last, closest to app)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=60, requests_per_hour=1000)
+app.add_middleware(SlowRequestMiddleware, threshold_ms=1000.0)
+app.add_middleware(RequestLoggingMiddleware)
+
+# Outermost middleware (added last = run first, wraps everything)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -140,15 +149,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Add request logging middleware
-app.add_middleware(RequestLoggingMiddleware)
-
-# Add slow request detection middleware (threshold: 1 second)
-app.add_middleware(SlowRequestMiddleware, threshold_ms=1000.0)
-
-# Add rate limiting middleware (60 requests/minute, 1000 requests/hour)
-app.add_middleware(RateLimitMiddleware, requests_per_minute=60, requests_per_hour=1000)
 
 # Register exception handlers
 register_exception_handlers(app)
