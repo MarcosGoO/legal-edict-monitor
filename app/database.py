@@ -8,6 +8,8 @@ This module provides:
 - Dependency injection for FastAPI
 """
 
+import logging
+import ssl as ssl_module
 from collections.abc import AsyncGenerator
 from typing import Any
 
@@ -18,8 +20,11 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.pool import NullPool
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 # Naming convention for constraints (useful for migrations)
 convention: dict[str, str] = {
@@ -46,19 +51,23 @@ class Base(DeclarativeBase):
         }
 
 
-# Pass SSL via connect_args for asyncpg compatibility (Neon, Supabase, etc.)
-_connect_args: dict = {}
-if "neon.tech" in settings.database_url or "ssl" in settings.database_url:
-    _connect_args = {"ssl": "require"}
+# Build SSL context for asyncpg (Neon, Supabase, RDS all require TLS).
+# asyncpg does NOT accept ssl="require" (that's psycopg2/libpq syntax).
+# We create an SSLContext with CERT_NONE: the channel is still fully encrypted,
+# we just skip server certificate verification (standard for cloud-managed PG).
+_ssl_context = ssl_module.create_default_context()
+_ssl_context.check_hostname = False
+_ssl_context.verify_mode = ssl_module.CERT_NONE
 
-# Create async engine
+# NullPool: no persistent connection pool.
+# Ideal for Render free tier (cold-start) + Neon serverless pooler.
+# Opens a fresh connection per request instead of keeping a pool alive.
 engine = create_async_engine(
     settings.async_database_url,
-    pool_size=settings.database_pool_size,
-    max_overflow=settings.database_max_overflow,
+    poolclass=NullPool,
     echo=settings.debug,
     future=True,
-    connect_args=_connect_args,
+    connect_args={"ssl": _ssl_context},
 )
 
 # Create session factory
@@ -74,7 +83,7 @@ async_session_factory = async_sessionmaker(
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency that provides a database session.
-    
+
     Usage in FastAPI:
         @app.get("/items")
         async def get_items(db: AsyncSession = Depends(get_db_session)):
@@ -105,7 +114,7 @@ async def close_db() -> None:
 async def check_database_connection() -> bool:
     """
     Check if database connection is healthy.
-    
+
     Returns:
         True if connection is healthy, False otherwise.
     """
@@ -113,5 +122,6 @@ async def check_database_connection() -> bool:
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
         return True
-    except Exception:
+    except Exception as e:
+        logger.error(f"Database connection check failed: {type(e).__name__}: {e}")
         return False
