@@ -10,7 +10,7 @@ export function Card({ className, children }: CardProps) {
   return (
     <div
       className={clsx(
-        'bg-ink-900 rounded-xl border border-ink-700/60 shadow-[0_2px_12px_rgba(0,0,0,0.4)] card-gold-hover',
+        'bg-ink-900 rounded-xl border border-ink-700/60 shadow-[0_2px_12px_rgba(0,0,0,0.07)] card-gold-hover',
         className,
       )}
     >

@@ -5,11 +5,11 @@ import type { EntityResponse, EntityType } from '../../../types/api'
 // ── Entity type metadata ─────────────────────────────────────────────────────
 
 const ENTITY_META: Record<EntityType, { label: string; badge: string; section: string }> = {
-  radicado: { label: 'Radicado',  badge: 'bg-indigo-950/60 text-indigo-300 border border-indigo-700/40',  section: 'radicados' },
-  nit:      { label: 'NIT',       badge: 'bg-emerald-950/60 text-emerald-300 border border-emerald-700/40', section: 'nits'     },
-  cedula:   { label: 'Cédula',    badge: 'bg-amber-950/60 text-amber-300 border border-amber-700/40',      section: 'cédulas'  },
-  nombre:   { label: 'Nombre',    badge: 'bg-violet-950/60 text-violet-300 border border-violet-700/40',   section: 'nombres'  },
-  court_id: { label: 'Juzgado',   badge: 'bg-sky-950/60 text-sky-300 border border-sky-700/40',            section: 'juzgados' },
+  radicado: { label: 'Radicado',  badge: 'bg-indigo-50 text-indigo-700 border border-indigo-200',  section: 'radicados' },
+  nit:      { label: 'NIT',       badge: 'bg-emerald-50 text-emerald-700 border border-emerald-200', section: 'nits'     },
+  cedula:   { label: 'Cédula',    badge: 'bg-amber-50 text-amber-700 border border-amber-200',      section: 'cédulas'  },
+  nombre:   { label: 'Nombre',    badge: 'bg-violet-50 text-violet-700 border border-violet-200',   section: 'nombres'  },
+  court_id: { label: 'Juzgado',   badge: 'bg-sky-50 text-sky-700 border border-sky-200',            section: 'juzgados' },
 }
 
 // ── Confidence dot ───────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ function ContextSnippet({ context, normalized }: { context: string; normalized: 
   return (
     <p className="text-xs text-ink-600 italic font-display bg-ink-800/60 rounded px-2.5 py-2 border border-ink-700/40 leading-relaxed">
       "{before}
-      <mark className="bg-gold-900 text-gold-300 border border-gold-700/40 not-italic font-medium rounded-sm px-0.5">
+      <mark className="bg-gold-900 text-gold-500 border border-gold-300/60 not-italic font-medium rounded-sm px-0.5">
         {match}
       </mark>
       {after}"
@@ -86,7 +86,7 @@ function CopyButton({ value }: { value: string }) {
 // ── Main component ───────────────────────────────────────────────────────────
 
 export default function EntityCard({ entity }: { entity: EntityResponse }) {
-  const meta = ENTITY_META[entity.type] ?? { label: entity.type, badge: 'bg-ink-800 text-ink-600 border border-ink-700/40', section: '' }
+  const meta = ENTITY_META[entity.type] ?? { label: entity.type, badge: 'bg-slate-100 text-slate-600 border border-slate-200', section: '' }
   const isDifferent = entity.raw !== entity.normalized
 
   return (

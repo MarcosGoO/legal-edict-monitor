@@ -26,7 +26,7 @@ export default function ConfirmDialog({
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/70 data-[state=open]:animate-in data-[state=open]:fade-in" />
         <Dialog.Content className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-ink-900 border border-ink-700/60 rounded-xl shadow-xl p-6 focus:outline-none">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-full bg-red-950/40 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
               <AlertTriangle className="w-5 h-5 text-red-400" />
             </div>
             <div>

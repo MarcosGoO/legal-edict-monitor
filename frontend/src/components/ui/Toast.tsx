@@ -59,7 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               key={t.id}
               open
               className={clsx(
-                'flex items-center gap-3 px-4 py-3 bg-ink-800 border border-ink-700/60 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.6)]',
+                'flex items-center gap-3 px-4 py-3 bg-ink-800 border border-ink-700/60 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.12)]',
                 'data-[state=open]:animate-in data-[state=open]:slide-in-from-right-4',
                 'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-4',
                 'max-w-sm w-full',

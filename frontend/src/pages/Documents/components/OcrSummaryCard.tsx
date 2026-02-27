@@ -2,9 +2,9 @@ import { Cpu, FileCheck, Eye } from 'lucide-react'
 import type { OCRResponse } from '../../../types/api'
 
 const ENGINE_META: Record<string, { label: string; color: string }> = {
-  native:    { label: 'PDF Nativo',    color: 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40' },
-  tesseract: { label: 'Tesseract OCR', color: 'bg-blue-950/40 text-blue-400 border border-blue-800/40'         },
-  textract:  { label: 'AWS Textract',  color: 'bg-violet-950/40 text-violet-400 border border-violet-800/40'   },
+  native:    { label: 'PDF Nativo',    color: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  tesseract: { label: 'Tesseract OCR', color: 'bg-blue-50 text-blue-700 border border-blue-200'         },
+  textract:  { label: 'AWS Textract',  color: 'bg-violet-50 text-violet-700 border border-violet-200'   },
 }
 
 function ConfidenceBar({ value }: { value: number }) {
@@ -21,7 +21,7 @@ function ConfidenceBar({ value }: { value: number }) {
 }
 
 export default function OcrSummaryCard({ ocr }: { ocr: OCRResponse }) {
-  const engine = ENGINE_META[ocr.engine_used] ?? { label: ocr.engine_used, color: 'bg-ink-800 text-ink-600 border border-ink-700/40' }
+  const engine = ENGINE_META[ocr.engine_used] ?? { label: ocr.engine_used, color: 'bg-slate-100 text-slate-600 border border-slate-200' }
 
   return (
     <div className="bg-ink-800/50 border border-ink-700/40 rounded-xl p-4 space-y-3">

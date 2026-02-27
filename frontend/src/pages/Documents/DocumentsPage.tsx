@@ -12,7 +12,7 @@ import type { DocumentProcessResponse, TextParseResponse } from '../../types/api
 const tabTriggerCls =
   'flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ' +
   'border-transparent text-ink-600 hover:text-parchment ' +
-  'data-[state=active]:border-gold-500 data-[state=active]:text-gold-400'
+  'data-[state=active]:border-gold-500 data-[state=active]:text-gold-500'
 
 export default function DocumentsPage() {
   const [activeTab, setActiveTab] = useState<'pdf' | 'text'>('pdf')

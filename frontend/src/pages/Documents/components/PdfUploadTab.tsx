@@ -50,7 +50,7 @@ export default function PdfUploadTab({ onProcess, isLoading }: PdfUploadTabProps
           dragging
             ? 'border-gold-500 bg-gold-900/30'
             : file
-            ? 'border-emerald-600/60 bg-emerald-950/20'
+            ? 'border-emerald-500 bg-emerald-50'
             : 'border-ink-700/60 hover:border-gold-500/50 bg-ink-800/30',
         )}
       >
@@ -72,7 +72,7 @@ export default function PdfUploadTab({ onProcess, isLoading }: PdfUploadTabProps
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleClear() }}
-              className="ml-2 p-1.5 rounded-full text-ink-600 hover:text-red-400 hover:bg-red-950/40 transition-colors"
+              className="ml-2 p-1.5 rounded-full text-ink-600 hover:text-red-600 hover:bg-red-50 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -91,7 +91,7 @@ export default function PdfUploadTab({ onProcess, isLoading }: PdfUploadTabProps
       </div>
 
       {sizeError && (
-        <div className="flex items-center gap-2 text-red-400 text-sm bg-red-950/30 border border-red-700/40 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           El archivo supera el límite de {MAX_SIZE_MB} MB.
         </div>

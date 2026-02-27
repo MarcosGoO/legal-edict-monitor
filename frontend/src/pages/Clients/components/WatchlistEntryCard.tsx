@@ -28,7 +28,7 @@ export default function WatchlistEntryCard({ entry }: WatchlistEntryCardProps) {
             {entry.case_numbers.map((n) => (
               <span
                 key={n}
-                className="inline-flex items-center px-2 py-0.5 bg-indigo-950/40 border border-indigo-700/40 rounded text-xs text-indigo-300"
+                className="inline-flex items-center px-2 py-0.5 bg-indigo-50 border border-indigo-200 rounded text-xs text-indigo-700"
               >
                 <MonoValue value={n} copyable />
               </span>
@@ -47,7 +47,7 @@ export default function WatchlistEntryCard({ entry }: WatchlistEntryCardProps) {
             {entry.court_ids.map((c) => (
               <span
                 key={c}
-                className="px-2 py-0.5 bg-sky-950/40 border border-sky-700/40 rounded text-xs text-sky-300"
+                className="px-2 py-0.5 bg-sky-50 border border-sky-200 rounded text-xs text-sky-700"
               >
                 {c}
               </span>
