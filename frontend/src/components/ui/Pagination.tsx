@@ -24,8 +24,8 @@ export default function Pagination({
     'flex items-center justify-center w-8 h-8 rounded-md text-sm font-medium transition-colors'
 
   return (
-    <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-100">
-      <p className="text-xs text-slate-500 flex-shrink-0">
+    <div className="flex items-center justify-between gap-4 mt-4 pt-4 border-t border-ink-700/40">
+      <p className="text-xs text-ink-600 flex-shrink-0">
         {total === 0 ? 'Sin resultados' : `${from}–${to} de ${total}`}
       </p>
 
@@ -33,7 +33,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className={clsx(btnBase, 'text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed')}
+          className={clsx(btnBase, 'text-ink-600 hover:bg-ink-800 disabled:opacity-40 disabled:cursor-not-allowed')}
           aria-label="Página anterior"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -48,7 +48,7 @@ export default function Pagination({
           }, [])
           .map((p, i) =>
             p === '...' ? (
-              <span key={`ellipsis-${i}`} className="w-8 text-center text-xs text-slate-400">
+              <span key={`ellipsis-${i}`} className="w-8 text-center text-xs text-ink-600">
                 …
               </span>
             ) : (
@@ -58,8 +58,8 @@ export default function Pagination({
                 className={clsx(
                   btnBase,
                   p === page
-                    ? 'bg-brand-500 text-white'
-                    : 'text-slate-600 hover:bg-slate-100',
+                    ? 'bg-gold-500 text-ink-950 font-semibold'
+                    : 'text-ink-600 hover:bg-ink-800',
                 )}
               >
                 {p}
@@ -70,7 +70,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className={clsx(btnBase, 'text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed')}
+          className={clsx(btnBase, 'text-ink-600 hover:bg-ink-800 disabled:opacity-40 disabled:cursor-not-allowed')}
           aria-label="Página siguiente"
         >
           <ChevronRight className="w-4 h-4" />
@@ -81,7 +81,7 @@ export default function Pagination({
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="text-xs text-slate-600 border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="text-xs text-ink-600 border border-ink-700/60 rounded-md px-2 py-1 bg-ink-900 focus:outline-none focus:ring-1 focus:ring-gold-500"
         >
           {[10, 20, 50].map((s) => (
             <option key={s} value={s}>

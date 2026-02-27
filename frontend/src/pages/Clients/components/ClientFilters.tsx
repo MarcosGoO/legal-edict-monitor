@@ -38,19 +38,19 @@ export default function ClientFilters({
     <div className="flex flex-wrap items-center gap-3">
       {/* Search */}
       <div className="relative flex-1 min-w-[200px] max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-600 pointer-events-none" />
         <input
           type="text"
           placeholder="Buscar por nombre o documento…"
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+          className="w-full pl-9 pr-3 py-2 text-sm border border-ink-700/60 rounded-lg bg-ink-900 text-parchment/90 placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent"
         />
       </div>
 
       {/* Active filter pills */}
-      <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-        <Filter className="w-3.5 h-3.5 text-slate-400 ml-1.5" />
+      <div className="flex items-center gap-1 bg-ink-800 rounded-lg p-1">
+        <Filter className="w-3.5 h-3.5 text-ink-600 ml-1.5" />
         {filterOptions.map(({ value, label }) => (
           <button
             key={value}
@@ -58,8 +58,8 @@ export default function ClientFilters({
             className={clsx(
               'px-3 py-1 rounded-md text-xs font-medium transition-colors',
               activeFilter === value
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700',
+                ? 'bg-gold-500 text-ink-950 font-semibold'
+                : 'text-ink-600 hover:text-parchment',
             )}
           >
             {label}

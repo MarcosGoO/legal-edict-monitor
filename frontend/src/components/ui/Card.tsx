@@ -8,7 +8,12 @@ interface CardProps {
 
 export function Card({ className, children }: CardProps) {
   return (
-    <div className={clsx('bg-white rounded-xl border border-slate-200 shadow-sm', className)}>
+    <div
+      className={clsx(
+        'bg-ink-900 rounded-xl border border-ink-700/60 shadow-[0_2px_12px_rgba(0,0,0,0.4)] card-gold-hover',
+        className,
+      )}
+    >
       {children}
     </div>
   )
@@ -22,10 +27,10 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, description, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+    <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-ink-700/40">
       <div>
-        <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
-        {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
+        <h3 className="text-sm font-semibold text-parchment">{title}</h3>
+        {description && <p className="text-xs text-ink-600 mt-0.5">{description}</p>}
       </div>
       {action && <div className="ml-4 flex-shrink-0">{action}</div>}
     </div>

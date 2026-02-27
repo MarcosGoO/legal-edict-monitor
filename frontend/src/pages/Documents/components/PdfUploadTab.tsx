@@ -48,10 +48,10 @@ export default function PdfUploadTab({ onProcess, isLoading }: PdfUploadTabProps
           'relative border-2 border-dashed rounded-xl p-10 text-center transition-colors',
           !file && 'cursor-pointer',
           dragging
-            ? 'border-brand-500 bg-brand-100'
+            ? 'border-gold-500 bg-gold-900/30'
             : file
-            ? 'border-emerald-300 bg-emerald-50'
-            : 'border-slate-200 hover:border-brand-300 bg-slate-50',
+            ? 'border-emerald-600/60 bg-emerald-950/20'
+            : 'border-ink-700/60 hover:border-gold-500/50 bg-ink-800/30',
         )}
       >
         <input
@@ -64,34 +64,34 @@ export default function PdfUploadTab({ onProcess, isLoading }: PdfUploadTabProps
 
         {file ? (
           <div className="flex items-center justify-center gap-3">
-            <FileText className="w-8 h-8 text-emerald-500 flex-shrink-0" />
+            <FileText className="w-8 h-8 text-emerald-400 flex-shrink-0" />
             <div className="text-left">
-              <p className="text-sm font-semibold text-slate-800 truncate max-w-xs">{file.name}</p>
-              <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p className="text-sm font-semibold text-parchment truncate max-w-xs">{file.name}</p>
+              <p className="text-xs text-ink-600">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
             </div>
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleClear() }}
-              className="ml-2 p-1.5 rounded-full text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              className="ml-2 p-1.5 rounded-full text-ink-600 hover:text-red-400 hover:bg-red-950/40 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <div className="space-y-2">
-            <UploadCloud className="w-10 h-10 text-slate-300 mx-auto" />
+            <UploadCloud className="w-10 h-10 text-ink-600 mx-auto" />
             <div>
-              <p className="text-sm font-medium text-slate-600">
-                Arrastra un PDF aquí o <span className="text-brand-500">selecciona un archivo</span>
+              <p className="text-sm font-medium text-parchment/80">
+                Arrastra un PDF aquí o <span className="text-gold-500">selecciona un archivo</span>
               </p>
-              <p className="text-xs text-slate-400 mt-1">Solo archivos PDF · Máximo {MAX_SIZE_MB} MB</p>
+              <p className="text-xs text-ink-600 mt-1">Solo archivos PDF · Máximo {MAX_SIZE_MB} MB</p>
             </div>
           </div>
         )}
       </div>
 
       {sizeError && (
-        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <div className="flex items-center gap-2 text-red-400 text-sm bg-red-950/30 border border-red-700/40 rounded-lg px-3 py-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           El archivo supera el límite de {MAX_SIZE_MB} MB.
         </div>
@@ -100,7 +100,7 @@ export default function PdfUploadTab({ onProcess, isLoading }: PdfUploadTabProps
       <button
         onClick={() => file && onProcess(file)}
         disabled={!file || isLoading}
-        className="w-full py-2.5 bg-brand-500 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-2.5 bg-gold-500 text-ink-950 text-sm font-medium rounded-lg hover:bg-gold-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? 'Procesando documento…' : 'Procesar documento'}
       </button>

@@ -11,8 +11,8 @@ import type { DocumentProcessResponse, TextParseResponse } from '../../types/api
 
 const tabTriggerCls =
   'flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px ' +
-  'border-transparent text-slate-500 hover:text-slate-700 ' +
-  'data-[state=active]:border-brand-500 data-[state=active]:text-brand-600'
+  'border-transparent text-ink-600 hover:text-parchment ' +
+  'data-[state=active]:border-gold-500 data-[state=active]:text-gold-400'
 
 export default function DocumentsPage() {
   const [activeTab, setActiveTab] = useState<'pdf' | 'text'>('pdf')
@@ -49,15 +49,15 @@ export default function DocumentsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-4">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">Procesamiento de Documentos</h2>
-        <p className="text-sm text-slate-500 mt-0.5">
+        <h2 className="font-display text-3xl text-parchment">Procesamiento de Documentos</h2>
+        <p className="text-xs text-ink-600 uppercase tracking-[0.12em] mt-1">
           Sube un PDF o pega texto para extraer entidades legales colombianas.
         </p>
       </div>
 
       <Card>
         <Tabs.Root value={activeTab} onValueChange={(v) => setActiveTab(v as 'pdf' | 'text')}>
-          <Tabs.List className="flex border-b border-slate-200 px-5 pt-4">
+          <Tabs.List className="flex border-b border-ink-700/40 px-5 pt-4">
             <Tabs.Trigger value="pdf" className={`focus:outline-none ${tabTriggerCls}`}>
               <FileText className="w-4 h-4" />
               Subir PDF
@@ -79,7 +79,7 @@ export default function DocumentsPage() {
         </Tabs.Root>
 
         {isLoading && (
-          <div className="border-t border-slate-100">
+          <div className="border-t border-ink-700/40">
             <CardBody>
               <ProcessingState mode={activeTab} />
             </CardBody>

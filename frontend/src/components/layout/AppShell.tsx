@@ -7,7 +7,7 @@ export default function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-full min-h-screen bg-slate-50">
+    <div className="flex h-full min-h-screen bg-ink-950">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -19,7 +19,7 @@ export default function AppShell() {
       {/* Sidebar — fixed on desktop, slide-in overlay on mobile */}
       <div
         className={[
-          'fixed inset-y-0 left-0 z-30 w-60 transition-transform duration-200 md:static md:translate-x-0 md:z-auto',
+          'fixed inset-y-0 left-0 z-30 w-64 transition-transform duration-200 md:static md:translate-x-0 md:z-auto',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         ].join(' ')}
       >

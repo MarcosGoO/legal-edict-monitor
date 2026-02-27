@@ -3,17 +3,17 @@ import { clsx } from 'clsx'
 type StatusVariant = 'success' | 'error' | 'warning' | 'neutral'
 
 const variantClasses: Record<StatusVariant, string> = {
-  success: 'bg-emerald-100 text-emerald-700',
-  error: 'bg-red-100 text-red-700',
-  warning: 'bg-amber-100 text-amber-700',
-  neutral: 'bg-slate-100 text-slate-600',
+  success: 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40',
+  error:   'bg-red-950/60 text-red-400 border border-red-800/40',
+  warning: 'bg-amber-950/60 text-amber-400 border border-amber-800/40',
+  neutral: 'bg-ink-800 text-ink-600 border border-ink-700/40',
 }
 
 const dotClasses: Record<StatusVariant, string> = {
-  success: 'bg-emerald-500',
-  error: 'bg-red-500',
-  warning: 'bg-amber-500',
-  neutral: 'bg-slate-400',
+  success: 'dot-glow-green',
+  error:   'dot-glow-red',
+  warning: 'bg-amber-400 w-1.5 h-1.5 rounded-full flex-shrink-0',
+  neutral: 'bg-ink-600 w-1.5 h-1.5 rounded-full flex-shrink-0',
 }
 
 interface StatusBadgeProps {
@@ -32,9 +32,7 @@ export default function StatusBadge({ variant, label, dot = true, className }: S
         className,
       )}
     >
-      {dot && (
-        <span className={clsx('w-1.5 h-1.5 rounded-full flex-shrink-0', dotClasses[variant])} />
-      )}
+      {dot && <span className={dotClasses[variant]} />}
       {label}
     </span>
   )

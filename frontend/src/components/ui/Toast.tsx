@@ -32,9 +32,9 @@ const ICONS: Record<ToastVariant, React.ElementType> = {
 }
 
 const COLORS: Record<ToastVariant, string> = {
-  success: 'text-emerald-500',
-  error:   'text-red-500',
-  info:    'text-blue-500',
+  success: 'text-emerald-400',
+  error:   'text-red-400',
+  info:    'text-gold-400',
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -59,17 +59,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               key={t.id}
               open
               className={clsx(
-                'flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-lg',
+                'flex items-center gap-3 px-4 py-3 bg-ink-800 border border-ink-700/60 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.6)]',
                 'data-[state=open]:animate-in data-[state=open]:slide-in-from-right-4',
                 'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right-4',
                 'max-w-sm w-full',
               )}
             >
               <Icon className={`w-4 h-4 flex-shrink-0 ${COLORS[t.variant]}`} />
-              <ToastPrimitive.Description className="flex-1 text-sm text-slate-700">
+              <ToastPrimitive.Description className="flex-1 text-sm text-parchment/90">
                 {t.message}
               </ToastPrimitive.Description>
-              <ToastPrimitive.Close className="text-slate-400 hover:text-slate-600 p-0.5 rounded">
+              <ToastPrimitive.Close className="text-ink-600 hover:text-parchment p-0.5 rounded">
                 <X className="w-3.5 h-3.5" />
               </ToastPrimitive.Close>
             </ToastPrimitive.Root>

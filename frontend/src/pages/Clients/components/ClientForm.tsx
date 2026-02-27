@@ -51,19 +51,19 @@ function Field({
 }) {
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-slate-700">
+      <label className="block text-sm font-medium text-parchment/80">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-        {hint && <span className="ml-1.5 text-xs text-slate-400 font-normal">{hint}</span>}
+        {required && <span className="text-red-400 ml-0.5">*</span>}
+        {hint && <span className="ml-1.5 text-xs text-ink-600 font-normal">{hint}</span>}
       </label>
       {children}
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   )
 }
 
 const inputCls =
-  'w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent'
+  'w-full px-3 py-2 text-sm border border-ink-700/60 rounded-lg bg-ink-800/50 text-parchment/90 placeholder:text-ink-600 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent'
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -196,11 +196,11 @@ export default function ClientForm({ defaultValues, onSubmit, isLoading }: Clien
                   type="checkbox"
                   checked={field.value}
                   onChange={field.onChange}
-                  className="w-4 h-4 rounded accent-brand-500"
+                  className="w-4 h-4 rounded accent-gold-500"
                 />
               )}
             />
-            <span className="text-sm text-slate-700">Cliente activo</span>
+            <span className="text-sm text-parchment/80">Cliente activo</span>
           </label>
         </Field>
       )}
@@ -209,14 +209,14 @@ export default function ClientForm({ defaultValues, onSubmit, isLoading }: Clien
         <button
           type="submit"
           disabled={isLoading}
-          className="px-5 py-2 bg-brand-500 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-60"
+          className="px-5 py-2 bg-gold-500 text-ink-950 text-sm font-medium rounded-lg hover:bg-gold-400 transition-colors disabled:opacity-60"
         >
           {isLoading ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear cliente'}
         </button>
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="px-5 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+          className="px-5 py-2 text-sm font-medium text-parchment/70 bg-ink-800 rounded-lg hover:bg-ink-700 transition-colors"
         >
           Cancelar
         </button>

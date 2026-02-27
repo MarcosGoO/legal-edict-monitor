@@ -8,7 +8,7 @@ interface MonoValueProps {
 }
 
 export default function MonoValue({ value, className, copyable }: MonoValueProps) {
-  if (!value) return <span className="text-slate-400">—</span>
+  if (!value) return <span className="text-ink-600">—</span>
 
   const handleClick = () => {
     if (copyable && value) {
@@ -19,8 +19,8 @@ export default function MonoValue({ value, className, copyable }: MonoValueProps
   return (
     <span
       className={clsx(
-        'font-mono text-sm tracking-tight text-slate-800',
-        copyable && 'cursor-pointer hover:text-brand-500 transition-colors',
+        'font-mono text-sm tracking-tight text-parchment/90',
+        copyable && 'cursor-pointer hover:text-gold-500 transition-colors',
         className,
       )}
       onClick={copyable ? handleClick : undefined}

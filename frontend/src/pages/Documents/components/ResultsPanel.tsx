@@ -8,11 +8,11 @@ import EntityCard from './EntityCard'
 // ── Summary bar ──────────────────────────────────────────────────────────────
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  radicados: { label: 'Radicados', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-  nits:      { label: 'NITs',      color: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-  cedulas:   { label: 'Cédulas',   color: 'bg-amber-100 text-amber-700 border-amber-200' },
-  names:     { label: 'Nombres',   color: 'bg-violet-100 text-violet-700 border-violet-200' },
-  court_ids: { label: 'Juzgados',  color: 'bg-sky-100 text-sky-700 border-sky-200' },
+  radicados: { label: 'Radicados', color: 'bg-indigo-950/40 text-indigo-400 border-indigo-800/40' },
+  nits:      { label: 'NITs',      color: 'bg-emerald-950/40 text-emerald-400 border-emerald-800/40' },
+  cedulas:   { label: 'Cédulas',   color: 'bg-amber-950/40 text-amber-400 border-amber-800/40' },
+  names:     { label: 'Nombres',   color: 'bg-violet-950/40 text-violet-400 border-violet-800/40' },
+  court_ids: { label: 'Juzgados',  color: 'bg-sky-950/40 text-sky-400 border-sky-800/40' },
 }
 
 function SummaryBar({ summary }: { summary: ParseSummary }) {
@@ -22,7 +22,7 @@ function SummaryBar({ summary }: { summary: ParseSummary }) {
   return (
     <div className="flex flex-wrap gap-2">
       {entries.map(([key, count]) => {
-        const meta = TYPE_LABELS[key] ?? { label: key, color: 'bg-slate-100 text-slate-600 border-slate-200' }
+        const meta = TYPE_LABELS[key] ?? { label: key, color: 'bg-ink-800 text-ink-600 border-ink-700/40' }
         return (
           <a
             key={key}
@@ -62,7 +62,7 @@ export default function ResultsPanel({ result }: { result: DocumentProcessRespon
     return (
       <Card>
         <CardBody>
-          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div className="flex items-center gap-2 p-3 bg-red-950/30 border border-red-700/40 rounded-lg text-sm text-red-400">
             <span className="font-semibold">Error:</span>
             <span>{result.error ?? 'No se pudo procesar el documento.'}</span>
           </div>
@@ -109,10 +109,10 @@ export default function ResultsPanel({ result }: { result: DocumentProcessRespon
         return (
           <div key={summaryKey} id={`section-${summaryKey}`} className="space-y-2 scroll-mt-6">
             <div className="flex items-center gap-2 px-1">
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <h3 className="text-xs font-semibold text-ink-600 uppercase tracking-wider">
                 {SECTION_TITLE[summaryKey]}
               </h3>
-              <span className="text-xs text-slate-400">({entities.length})</span>
+              <span className="text-xs text-ink-600">({entities.length})</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {entities.map((entity, i) => (

@@ -15,9 +15,57 @@
 
   body {
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    background-color: #F8FAFC;
-    color: #0F172A;
+    background-color: #0C111D;
+    color: #F5EDD6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Dark scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #111827;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4B5563;
+  }
+
+  /* Gold selection */
+  ::selection {
+    background: rgba(212, 168, 67, 0.3);
+    color: #F5EDD6;
+  }
+}
+
+@layer utilities {
+  .card-gold-hover {
+    @apply transition-all duration-200;
+    border-left: 2px solid transparent;
+  }
+  .card-gold-hover:hover {
+    border-left-color: #D4A843;
+    box-shadow: -2px 0 12px rgba(212, 168, 67, 0.15);
+  }
+
+  .dot-glow-green {
+    @apply w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0;
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.7);
+  }
+
+  .dot-glow-red {
+    @apply w-2 h-2 rounded-full bg-red-400 flex-shrink-0;
+    box-shadow: 0 0 6px rgba(248, 113, 113, 0.7);
+  }
+
+  .dot-glow-gold {
+    @apply w-2 h-2 rounded-full bg-gold-500 flex-shrink-0;
+    box-shadow: 0 0 6px rgba(212, 168, 67, 0.7);
   }
 }

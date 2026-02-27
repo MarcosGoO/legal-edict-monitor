@@ -8,21 +8,20 @@ interface StatItemProps {
   label: string
   value: string | number
   loading: boolean
-  color: string
 }
 
-function StatItem({ icon: Icon, label, value, loading, color }: StatItemProps) {
+function StatItem({ icon: Icon, label, value, loading }: StatItemProps) {
   return (
     <div className="flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
-        <Icon className="w-5 h-5 text-white" />
+      <div className="w-10 h-10 rounded-lg bg-gold-500 flex items-center justify-center flex-shrink-0">
+        <Icon className="w-5 h-5 text-ink-950" />
       </div>
       <div>
-        <p className="text-xs text-slate-500">{label}</p>
+        <p className="text-xs text-ink-600 uppercase tracking-[0.12em]">{label}</p>
         {loading ? (
           <LoadingSpinner size="sm" className="mt-1" />
         ) : (
-          <p className="text-xl font-bold text-slate-800">{value}</p>
+          <p className="font-display text-4xl font-bold text-parchment leading-none mt-0.5">{value}</p>
         )}
       </div>
     </div>
@@ -41,15 +40,13 @@ export default function QuickStats() {
           label="Clientes totales"
           value={all.data?.total ?? 0}
           loading={all.isLoading}
-          color="bg-brand-500"
         />
-        <div className="w-px bg-slate-200 self-stretch hidden sm:block" />
+        <div className="w-px bg-ink-700 self-stretch hidden sm:block" />
         <StatItem
           icon={UserCheck}
           label="Clientes activos"
           value={active.data?.total ?? 0}
           loading={active.isLoading}
-          color="bg-emerald-500"
         />
       </CardBody>
     </Card>

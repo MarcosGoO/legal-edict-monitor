@@ -61,14 +61,14 @@ export default function ClientListPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Clientes</h2>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h2 className="font-display text-3xl text-parchment">Clientes</h2>
+          <p className="text-xs text-ink-600 uppercase tracking-[0.12em] mt-1">
             {data ? `${data.total} cliente${data.total !== 1 ? 's' : ''} registrados` : 'Cargando…'}
           </p>
         </div>
         <button
           onClick={() => navigate('/clients/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-500 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gold-500 text-ink-950 text-sm font-medium rounded-lg hover:bg-gold-400 transition-colors"
         >
           <UserPlus className="w-4 h-4" />
           Nuevo cliente

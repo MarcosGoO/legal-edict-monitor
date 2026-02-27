@@ -39,11 +39,11 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const crumbs = useBreadcrumbs()
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 flex-shrink-0">
+    <header className="h-14 bg-ink-900 border-b border-ink-700/50 flex items-center px-4 gap-3 flex-shrink-0">
       {/* Hamburger — only on mobile */}
       <button
         onClick={onMenuClick}
-        className="md:hidden p-1.5 rounded-md text-slate-500 hover:bg-slate-100"
+        className="md:hidden p-1.5 rounded-md text-ink-600 hover:bg-ink-800"
         aria-label="Abrir menú"
       >
         <Menu className="w-5 h-5" />
@@ -53,16 +53,16 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
       <nav className="flex items-center gap-1 text-sm">
         {crumbs.map((crumb, i) => (
           <span key={i} className="flex items-center gap-1">
-            {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-slate-400" />}
+            {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-ink-600" />}
             {crumb.to ? (
               <Link
                 to={crumb.to}
-                className="text-slate-500 hover:text-slate-800 transition-colors"
+                className="text-ink-600 hover:text-parchment transition-colors"
               >
                 {crumb.label}
               </Link>
             ) : (
-              <span className="text-slate-800 font-semibold">{crumb.label}</span>
+              <span className="text-parchment font-semibold">{crumb.label}</span>
             )}
           </span>
         ))}
