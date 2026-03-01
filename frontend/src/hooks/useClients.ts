@@ -29,7 +29,12 @@ export function useUpdateClient(id: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (payload: ClientCreate) => updateClient(id, payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['clients'] }),
+    onSuccess: (updatedClient) => {
+      // Update the individual client cache immediately to avoid a redundant refetch
+      qc.setQueryData(['clients', id], updatedClient)
+      // Invalidate list queries so paginated/filtered views stay consistent
+      qc.invalidateQueries({ queryKey: ['clients', {}], exact: false })
+    },
   })
 }
 

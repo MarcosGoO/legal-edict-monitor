@@ -117,13 +117,23 @@ COLOMBIAN_PATTERNS: list[EntityPattern] = [
 ]
 
 
+_compiled_patterns: dict[EntityType, list[re.Pattern]] | None = None
+
+
 def compile_patterns() -> dict[EntityType, list[re.Pattern]]:
     """
     Compile all patterns into regex objects.
-    
+
+    Compiled patterns are cached at module level so regex compilation
+    only happens once per process, not on every parser instantiation.
+
     Returns:
         Dictionary mapping entity types to compiled patterns
     """
+    global _compiled_patterns
+    if _compiled_patterns is not None:
+        return _compiled_patterns
+
     compiled: dict[EntityType, list[re.Pattern]] = {}
 
     for pattern in COLOMBIAN_PATTERNS:
@@ -134,7 +144,8 @@ def compile_patterns() -> dict[EntityType, list[re.Pattern]]:
             re.compile(pattern.pattern, re.IGNORECASE | re.MULTILINE)
         )
 
-    return compiled
+    _compiled_patterns = compiled
+    return _compiled_patterns
 
 
 def get_pattern_examples() -> dict[EntityType, list[str]]:

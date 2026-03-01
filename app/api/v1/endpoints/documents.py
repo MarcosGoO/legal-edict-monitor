@@ -20,6 +20,11 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Module-level singletons — instantiated once per process to avoid
+# re-loading spaCy models and re-compiling regex patterns on every request.
+_ocr_service = SmartOCRService()
+_parser = ColombianEntityParser()
+
 
 # ============================================================================
 # Response Models
@@ -172,16 +177,12 @@ async def process_document(
         )
 
     try:
-        # Initialize services
-        ocr_service = SmartOCRService()
-        parser = ColombianEntityParser()
-
         # Process OCR
         logger.info(f"Processing document: {file.filename}")
-        ocr_result = await ocr_service.extract_text_from_bytes(content)
+        ocr_result = await _ocr_service.extract_text_from_bytes(content)
 
         # Parse entities
-        parse_result = parser.parse(ocr_result.text)
+        parse_result = _parser.parse(ocr_result.text)
 
         logger.info(
             f"Document processed: {ocr_result.word_count} words, "
@@ -247,8 +248,7 @@ async def parse_text(request: TextParseRequest) -> TextParseResponse:
     text from other sources.
     """
     try:
-        parser = ColombianEntityParser()
-        result = parser.parse(request.text)
+        result = _parser.parse(request.text)
 
         return TextParseResponse(
             success=True,
