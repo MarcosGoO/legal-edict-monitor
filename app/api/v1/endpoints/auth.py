@@ -158,10 +158,11 @@ async def login(body: LoginRequest) -> TokenResponse:
     email = body.email.lower()
     user = _get_user_by_email(email)
 
-    # Constant-time rejection: always verify even if user doesn't exist
-    # to avoid timing oracle on email enumeration.
-    dummy_hash = "$2b$12$notarealhashXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    stored_hash = user["password_hash"] if user else dummy_hash
+    # Constant-time rejection: always run bcrypt even when user doesn't exist
+    # to avoid a timing oracle on email enumeration.
+    # The dummy hash is a valid bcrypt hash of the string "dummy".
+    _DUMMY_HASH = "$2b$12$Jxz7RxmFHu3LKFOrI5zFLOEGkfT3Oc1p6Z4/yYQhvLq3ZkGaKZgPy"
+    stored_hash = user["password_hash"] if user else _DUMMY_HASH
 
     password_ok = verify_password(body.password, stored_hash)
 
