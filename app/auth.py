@@ -2,35 +2,34 @@
 JWT Authentication Service.
 
 Provides:
-- Password hashing and verification via bcrypt
+- Password hashing and verification via bcrypt (direct, no passlib)
 - JWT access/refresh token creation and verification
-- Current user extraction from token
 """
 
+import bcrypt
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.config import settings
 
-# bcrypt context — cost factor handled by passlib defaults
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 # ---------------------------------------------------------------------------
-# Password helpers
+# Password helpers (bcrypt direct — passlib 1.7.4 is incompatible with bcrypt>=4)
 # ---------------------------------------------------------------------------
 
 def hash_password(plain: str) -> str:
     """Return bcrypt hash of *plain* password."""
-    return _pwd_context.hash(plain)
+    return bcrypt.hashpw(plain.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Return True if *plain* matches *hashed*."""
-    return _pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode(), hashed.encode())
+    except Exception:
+        return False
 
 
 # ---------------------------------------------------------------------------

@@ -6,6 +6,8 @@ All protected endpoints require an authenticated user — the `auth_client`
 fixture handles registration and token injection automatically.
 """
 
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -23,19 +25,20 @@ def auth_client():
     """
     Test client pre-authenticated as an editor user.
 
-    Returns a (TestClient, headers) tuple so tests can call both
-    unauthenticated and authenticated requests from the same fixture.
+    Returns a (TestClient, headers) tuple. Uses a unique email per fixture
+    call so parallel/repeated test runs don't collide on the in-memory store.
     """
     tc = TestClient(app)
+    email = f"apitest_{uuid.uuid4().hex[:8]}@example.com"
 
     # Register + login
     tc.post(
         "/api/v1/auth/register",
-        json={"email": "apitest@example.com", "password": "testpassword1", "full_name": "API Tester"},
+        json={"email": email, "password": "testpassword1", "full_name": "API Tester"},
     )
     resp = tc.post(
         "/api/v1/auth/login",
-        json={"email": "apitest@example.com", "password": "testpassword1"},
+        json={"email": email, "password": "testpassword1"},
     )
     tokens = resp.json()
     headers = {"Authorization": f"Bearer {tokens['access_token']}"}
