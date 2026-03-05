@@ -14,7 +14,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import JWTError
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field
 
 from app.api.v1.deps import CurrentUser, get_current_user
 from app.auth import (
@@ -54,27 +54,12 @@ def _get_user_by_id(user_id: str) -> dict | None:
 # ---------------------------------------------------------------------------
 
 class RegisterRequest(BaseModel):
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "email": "abogado@firma.com",
-                "full_name": "Carlos Andrés Pérez",
-            }
-        }
-    )
-
     email: EmailStr
     password: str = Field(..., min_length=8, max_length=128)
     full_name: str | None = Field(None, max_length=255)
 
 
 class LoginRequest(BaseModel):
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {"email": "abogado@firma.com"}
-        }
-    )
-
     email: EmailStr
     password: str = Field(..., min_length=1)
 
