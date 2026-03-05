@@ -6,10 +6,12 @@ Provides endpoints for managing clients and watchlist entries.
 
 import uuid
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field
 
-router = APIRouter()
+from app.api.v1.deps import get_current_user
+
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 # ============================================================================

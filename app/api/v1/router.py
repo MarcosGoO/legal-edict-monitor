@@ -6,11 +6,18 @@ Aggregates all v1 API endpoints.
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import clients, documents
+from app.api.v1.endpoints import auth, clients, documents
 
 api_router = APIRouter()
 
-# Include endpoint routers
+# Auth endpoints — public (no authentication required)
+api_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Auth"],
+)
+
+# Protected endpoints — require valid JWT
 api_router.include_router(
     documents.router,
     prefix="/documents",

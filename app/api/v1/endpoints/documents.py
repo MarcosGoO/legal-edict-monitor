@@ -10,15 +10,16 @@ Provides endpoints for:
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.api.v1.deps import get_current_user
 from app.services.ocr import SmartOCRService
 from app.services.parser import ColombianEntityParser
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 # Module-level singletons — instantiated once per process to avoid
 # re-loading spaCy models and re-compiling regex patterns on every request.
