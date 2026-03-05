@@ -58,7 +58,7 @@ class RegisterRequest(BaseModel):
         json_schema_extra={
             "example": {
                 "email": "abogado@firma.com",
-                "password": "S3cur3P@ss!",
+                "password": "mi_contrasena_segura",
                 "full_name": "Carlos Andrés Pérez",
             }
         }
@@ -72,7 +72,7 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
-            "example": {"email": "abogado@firma.com", "password": "S3cur3P@ss!"}
+            "example": {"email": "abogado@firma.com", "password": "mi_contrasena_segura"}
         }
     )
 
