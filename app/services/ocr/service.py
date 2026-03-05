@@ -239,15 +239,11 @@ class SmartOCRService:
                 temp_path.unlink()
 
     async def _save_temp_pdf(self, file_obj: BinaryIO) -> Path:
-        """Save file-like object to temporary path."""
-        import os
-
-        temp_dir = tempfile.gettempdir()
-        temp_path = Path(temp_dir) / f"ocr_{os.getpid()}_{id(file_obj)}.pdf"
-
-        file_obj.seek(0)
-        with open(temp_path, "wb") as f:
-            f.write(file_obj.read())
+        """Save file-like object to a secure temporary path."""
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            temp_path = Path(tmp.name)
+            file_obj.seek(0)
+            tmp.write(file_obj.read())
 
         return temp_path
 
@@ -269,8 +265,6 @@ class SmartOCRService:
         Returns:
             OCRResult with extracted text
         """
-        import os
-
         from app.services.cache import CacheService, get_cache_service
 
         # Compute document hash for caching
@@ -285,13 +279,11 @@ class SmartOCRService:
                 logger.info(f"Using cached OCR result for {doc_hash[:16]}...")
                 return OCRResult.from_dict(cached_result)
 
-        temp_dir = tempfile.gettempdir()
-        temp_path = Path(temp_dir) / f"ocr_{os.getpid()}_{id(pdf_bytes)}.pdf"
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            temp_path = Path(tmp.name)
+            tmp.write(pdf_bytes)
 
         try:
-            with open(temp_path, "wb") as f:
-                f.write(pdf_bytes)
-
             result = await self.process_pdf(temp_path)
 
             # Cache the result if caching is enabled

@@ -35,7 +35,10 @@ def get_redis_pool() -> redis.ConnectionPool:
             decode_responses=True,
             max_connections=10,
         )
-        logger.info(f"Created Redis connection pool: {settings.redis_url}")
+        # Redact credentials (everything before the '@') before logging.
+        url = settings.redis_url
+        safe_url = url.split("@")[-1] if "@" in url else url
+        logger.info(f"Created Redis connection pool: {safe_url}")
 
     return _redis_pool
 
