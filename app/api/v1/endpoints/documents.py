@@ -127,7 +127,7 @@ class TextParseRequest(BaseModel):
         }
     )
 
-    text: str = Field(..., min_length=10, description="Text to parse for entities")
+    text: str = Field(..., min_length=10, max_length=100_000, description="Text to parse for entities")
 
 
 class TextParseResponse(BaseModel):
@@ -224,10 +224,10 @@ async def process_document(
         )
 
     except Exception as e:
-        logger.error(f"Error processing document: {e}")
+        logger.error(f"Error processing document '{file.filename}': {type(e).__name__}: {e}")
         return DocumentProcessResponse(
             success=False,
-            error=str(e),
+            error="An internal error occurred while processing the document.",
         )
 
 
@@ -277,10 +277,10 @@ async def parse_text(request: TextParseRequest) -> TextParseResponse:
         )
 
     except Exception as e:
-        logger.error(f"Error parsing text: {e}")
+        logger.error(f"Error parsing text: {type(e).__name__}: {e}")
         return TextParseResponse(
             success=False,
-            error=str(e),
+            error="An internal error occurred while parsing the text.",
         )
 
 
