@@ -104,18 +104,19 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             raise
 
     def _get_client_ip(self, request: Request) -> str:
-        """Extract client IP from request."""
-        # Check for forwarded headers (behind proxy)
+        """Extract client IP from request.
+
+        Uses the LAST value of X-Forwarded-For (set by the trusted proxy)
+        rather than the first, which a client can forge.
+        """
         forwarded = request.headers.get("X-Forwarded-For")
         if forwarded:
-            return forwarded.split(",")[0].strip()
+            return forwarded.split(",")[-1].strip()
 
-        # Check for real IP header
         real_ip = request.headers.get("X-Real-IP")
         if real_ip:
             return real_ip
 
-        # Fall back to direct client
         if request.client:
             return request.client.host
 
@@ -169,15 +170,10 @@ class SlowRequestMiddleware(BaseHTTPMiddleware):
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """
-    Simple in-memory rate limiting middleware.
-    
-    Features:
-    - Limits requests per IP address
-    - Configurable requests per window
-    - Returns 429 when limit exceeded
-    
-    Note: For production, consider using Redis-based rate limiting
-    for distributed systems.
+    Redis-backed rate limiting middleware with in-memory fallback.
+
+    Uses INCR + EXPIRE per key so state survives across workers and restarts.
+    Falls back to an in-memory sliding-window if Redis is unavailable.
     """
 
     def __init__(
@@ -186,29 +182,20 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         requests_per_minute: int = 60,
         requests_per_hour: int = 1000,
     ):
-        """
-        Initialize rate limit middleware.
-        
-        Args:
-            app: FastAPI application
-            requests_per_minute: Max requests per minute per IP
-            requests_per_hour: Max requests per hour per IP
-        """
         super().__init__(app)
         self.requests_per_minute = requests_per_minute
         self.requests_per_hour = requests_per_hour
 
-        # In-memory storage for rate limits
-        # Structure: {ip: {"minute": [(timestamp, count)], "hour": [(timestamp, count)]}}
-        self._requests: dict[str, dict[str, list[float]]] = defaultdict(
+        # In-memory fallback (used only when Redis is unreachable)
+        self._fallback: dict[str, dict[str, list[float]]] = defaultdict(
             lambda: {"minute": [], "hour": []}
         )
 
     def _get_client_ip(self, request: Request) -> str:
-        """Extract client IP from request."""
+        """Extract client IP using the LAST X-Forwarded-For value (proxy-set)."""
         forwarded = request.headers.get("X-Forwarded-For")
         if forwarded:
-            return forwarded.split(",")[0].strip()
+            return forwarded.split(",")[-1].strip()
 
         real_ip = request.headers.get("X-Real-IP")
         if real_ip:
@@ -219,40 +206,55 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         return "unknown"
 
-    def _clean_old_requests(self, timestamps: list[float], window_seconds: float) -> list[float]:
-        """Remove timestamps older than the window."""
+    async def _check_rate_limit_redis(self, ip: str) -> tuple[bool, str]:
+        """Check rate limit via Redis INCR+EXPIRE. Returns (allowed, reason)."""
+        from redis.exceptions import RedisError
+
+        from app.redis_client import get_redis_client
+
+        try:
+            client = await get_redis_client()
+
+            minute_key = f"ratelimit:{ip}:minute"
+            hour_key = f"ratelimit:{ip}:hour"
+
+            # Atomic increment; set TTL only on first increment
+            minute_count = await client.incr(minute_key)
+            if minute_count == 1:
+                await client.expire(minute_key, 60)
+
+            hour_count = await client.incr(hour_key)
+            if hour_count == 1:
+                await client.expire(hour_key, 3600)
+
+            if minute_count > self.requests_per_minute:
+                return False, f"Rate limit exceeded: {self.requests_per_minute} requests per minute"
+            if hour_count > self.requests_per_hour:
+                return False, f"Rate limit exceeded: {self.requests_per_hour} requests per hour"
+
+            return True, ""
+
+        except RedisError as exc:
+            logger.warning(f"Redis unavailable for rate limiting, using fallback: {exc}")
+            return self._check_rate_limit_fallback(ip)
+
+    def _check_rate_limit_fallback(self, ip: str) -> tuple[bool, str]:
+        """Sliding-window in-memory fallback used when Redis is unreachable."""
         current_time = time.time()
-        return [ts for ts in timestamps if current_time - ts < window_seconds]
+        self._fallback[ip]["minute"] = [
+            ts for ts in self._fallback[ip]["minute"] if current_time - ts < 60
+        ]
+        self._fallback[ip]["hour"] = [
+            ts for ts in self._fallback[ip]["hour"] if current_time - ts < 3600
+        ]
 
-    def _check_rate_limit(self, ip: str) -> tuple[bool, str]:
-        """
-        Check if IP is within rate limits.
-        
-        Returns:
-            Tuple of (is_allowed, reason)
-        """
-        current_time = time.time()
-
-        # Clean old requests
-        self._requests[ip]["minute"] = self._clean_old_requests(
-            self._requests[ip]["minute"], 60
-        )
-        self._requests[ip]["hour"] = self._clean_old_requests(
-            self._requests[ip]["hour"], 3600
-        )
-
-        # Check minute limit
-        if len(self._requests[ip]["minute"]) >= self.requests_per_minute:
+        if len(self._fallback[ip]["minute"]) >= self.requests_per_minute:
             return False, f"Rate limit exceeded: {self.requests_per_minute} requests per minute"
-
-        # Check hour limit
-        if len(self._requests[ip]["hour"]) >= self.requests_per_hour:
+        if len(self._fallback[ip]["hour"]) >= self.requests_per_hour:
             return False, f"Rate limit exceeded: {self.requests_per_hour} requests per hour"
 
-        # Record this request
-        self._requests[ip]["minute"].append(current_time)
-        self._requests[ip]["hour"].append(current_time)
-
+        self._fallback[ip]["minute"].append(current_time)
+        self._fallback[ip]["hour"].append(current_time)
         return True, ""
 
     async def dispatch(
@@ -261,13 +263,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         call_next: Callable,
     ) -> Response:
         """Process request with rate limiting."""
-        # Skip rate limiting for health checks and CORS preflight (OPTIONS)
         if request.url.path in ["/health", "/ready"] or request.method == "OPTIONS":
             return await call_next(request)
 
         client_ip = self._get_client_ip(request)
-
-        is_allowed, reason = self._check_rate_limit(client_ip)
+        is_allowed, reason = await self._check_rate_limit_redis(client_ip)
 
         if not is_allowed:
             logger.warning(
@@ -278,7 +278,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "path": request.url.path,
                 },
             )
-
             return JSONResponse(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 content={
