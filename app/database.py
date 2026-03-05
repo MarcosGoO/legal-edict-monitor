@@ -53,11 +53,10 @@ class Base(DeclarativeBase):
 
 # Build SSL context for asyncpg (Neon, Supabase, RDS all require TLS).
 # asyncpg does NOT accept ssl="require" (that's psycopg2/libpq syntax).
-# We create an SSLContext with CERT_NONE: the channel is still fully encrypted,
-# we just skip server certificate verification (standard for cloud-managed PG).
+# create_default_context() enables CERT_REQUIRED + hostname verification by default,
+# which protects against MitM attacks. Neon's certificates are signed by a well-known
+# CA so no custom CA bundle is needed.
 _ssl_context = ssl_module.create_default_context()
-_ssl_context.check_hostname = False
-_ssl_context.verify_mode = ssl_module.CERT_NONE
 
 # NullPool: no persistent connection pool.
 # Ideal for Render free tier (cold-start) + Neon serverless pooler.
