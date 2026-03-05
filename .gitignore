@@ -330,6 +330,14 @@ local.py
 plans/architecture.md
 plans/processing-pipeline.md
 
+
+# Claude
+CLAUDE.md
+.claude/
+.agents/
+.agent/
+
+
 # -----------------------------------------------------------------------------
 # Frontend
 # -----------------------------------------------------------------------------

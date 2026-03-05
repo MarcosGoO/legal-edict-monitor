@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "skills": {
+    "code-review-analysis": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "computedHash": "5424854b2fb6996bb56d2772815edd1101c0867cf9229972c2f3dd217a092486"
+    },
+    "database-migrations": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "computedHash": "5be50d1b88799b22a9a1fe0ea79408484ea9e20bd3a7ddce2ad6309c9a991dc7"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "25872a21881a950edc3db1f3329664d60405d539660ce05b3265db2de06a7dfd"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "git-commit": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2607fc60629b82b257136dd2a7a373f0a4466c0b49df7746d845d59313c99b21"
+    },
+    "pytest": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "computedHash": "6eeda8b7f39eb2cdbd3a35ca00362b2d3942b0464e20a500fed4605337315f47"
+    },
+    "react-patterns": {
+      "source": "giuseppe-trisciuoglio/developer-kit",
+      "sourceType": "github",
+      "computedHash": "fbccae8efbe606590beef3193287a106b75cca814738a4a1f7658d7786f73861"
+    }
+  }
+}
